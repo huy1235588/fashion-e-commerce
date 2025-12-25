@@ -10,12 +10,13 @@ Website Thương mại điện tử Thời trang
 
 ### 2. Công nghệ sử dụng
 - **Backend**: Golang (Gin Framework)
-- **Frontend**: React.js + Vite
+- **Frontend**: Next.js 16.1.1 (App Router) + TypeScript
 - **Database**: PostgreSQL
 - **Authentication**: JWT
 - **Payment**: VNPay/MoMo
 - **Styling**: Tailwind CSS
-- **State Management**: React Context API / Redux Toolkit (optional)
+- **State Management**: Zustand / React Context API
+- **UI Components**: Radix UI / shadcn/ui
 
 ### 3. Mô tả tổng quan
 Xây dựng hệ thống website thương mại điện tử chuyên bán các sản phẩm thời trang, hỗ trợ người dùng mua sắm trực tuyến với đầy đủ các tính năng cốt lõi.
@@ -575,17 +576,19 @@ GET    /api/admin/stats/customers  # Thống kê khách hàng (Admin)
 - [ ] Thống kê báo cáo
 - [ ] Quản lý khách hàng
 
-### Giai đoạn 5: Frontend React (2-3 tuần)
-- [ ] Setup Vite + React + Tailwind CSS
-- [ ] Setup React Router, Axios, Context API
+### Giai đoạn 5: Frontend Next.js + TypeScript (2-3 tuần)
+- [ ] Setup Next.js 16.1.1 với App Router + TypeScript
+- [ ] Setup Tailwind CSS, shadcn/ui, Zustand
+- [ ] TypeScript types cho tất cả models
 - [ ] Components chung (Header, Footer, Loading)
-- [ ] Authentication UI (Login, Register)
-- [ ] Trang chủ với banner và sản phẩm nổi bật
+- [ ] Authentication UI (Login, Register) với route groups
+- [ ] Trang chủ với banner và sản phẩm nổi bật (SSR/SSG)
 - [ ] Danh sách sản phẩm (filter, search, pagination)
 - [ ] Chi tiết sản phẩm (ảnh, đánh giá, chọn variant)
-- [ ] Giỏ hàng và Checkout
+- [ ] Giỏ hàng và Checkout với state management
 - [ ] Quản lý đơn hàng, profile
 - [ ] Admin panel (Dashboard, Products, Orders)
+- [ ] API Routes cho server-side logic (nếu cần)
 
 ### Giai đoạn 6: Testing & Triển khai (1 tuần)
 - [ ] Viết unit tests

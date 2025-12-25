@@ -20,12 +20,13 @@ Fashion E-Commerce is a full-stack e-commerce platform for selling fashion produ
 - **Payment Gateways**: VNPay, MoMo
 
 ### Frontend
-- **Framework**: React 18+
-- **Build Tool**: Vite
+- **Framework**: Next.js 16.1.1 (App Router)
+- **Language**: TypeScript 5+
 - **Styling**: Tailwind CSS
-- **State Management**: Context API (Redux Toolkit optional)
-- **Routing**: React Router v6
-- **HTTP Client**: Axios
+- **State Management**: Zustand / React Context API
+- **HTTP Client**: Axios / Fetch API
+- **UI Components**: Radix UI / shadcn/ui
+- **Rendering**: SSR, SSG, and Client-side rendering
 
 ### Database
 - **Primary Database**: PostgreSQL 15+
@@ -47,12 +48,16 @@ Fashion E-Commerce is a full-stack e-commerce platform for selling fashion produ
 - Error handling: Always check errors, use descriptive error messages
 - Comments: Use godoc-style comments for exported functions
 
-**React/JavaScript:**
+**TypeScript/Next.js:**
+- Use TypeScript for all code (strict mode enabled)
 - Use functional components with hooks
-- Use PascalCase for component names
+- Use PascalCase for component names, interfaces, and types
 - Use camelCase for functions and variables
 - Follow Tailwind CSS utility-first approach
 - Prefer const over let, avoid var
+- Use Next.js App Router conventions (Server/Client Components)
+- Define proper types for all props, state, and API responses
+- Use 'use client' directive only when necessary
 
 **Database:**
 - Use lowercase with underscores for table and column names
@@ -82,12 +87,16 @@ internal/
 - Middleware: Authentication, authorization, request validation
 - Dependency Injection: Pass dependencies through constructors
 
-**Frontend Architecture:**
-- Component-based architecture
+**Frontend Architecture (Next.js App Router):**
+- Component-based architecture with Server/Client Components
 - Smart/Container components handle logic
 - Dumb/Presentational components for UI
-- Context API for global state (user, cart)
+- Zustand or Context API for global state (user, cart)
 - Custom hooks for reusable logic
+- API services layer for backend communication
+- TypeScript types/interfaces in dedicated files
+- Route groups for logical organization
+- Server Components by default, Client Components when needed
 
 ### Testing Strategy
 - Unit tests for critical business logic (services, repositories)

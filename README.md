@@ -17,12 +17,12 @@ Xây dựng một hệ thống website bán hàng thời trang hoàn chỉnh v�
 - **Email**: SMTP (Gmail)
 
 ### Frontend
-- **Framework**: React 18+
-- **Build Tool**: Vite
+- **Framework**: Next.js 16.1.1 (App Router)
+- **Language**: TypeScript 5+
 - **Styling**: Tailwind CSS
-- **State Management**: Context API
-- **Routing**: React Router v6
-- **HTTP Client**: Axios
+- **State Management**: Zustand / React Context
+- **HTTP Client**: Axios / Fetch API
+- **UI Components**: Radix UI / shadcn/ui
 
 ### Database
 - **Database**: PostgreSQL 15+
@@ -110,7 +110,7 @@ npm install
 npm run dev
 ```
 
-Frontend will start at: **http://localhost:5173**
+Frontend will start at: **http://localhost:3000**
 
 See [frontend/README.md](frontend/README.md) for detailed setup instructions.
 
@@ -130,13 +130,13 @@ fashion-e-commerce/
 │   │   ├── repositories/# Data access layer
 │   │   └── services/    # Business logic
 │   └── .env.example     # Environment variables template
-├── frontend/            # React frontend application
+├── frontend/            # Next.js frontend application
 │   ├── src/
+│   │   ├── app/         # Next.js App Router pages
 │   │   ├── components/  # React components
-│   │   ├── pages/       # Page components
-│   │   ├── routes/      # Route configuration
+│   │   ├── lib/         # Utilities and configurations
 │   │   ├── services/    # API services
-│   │   └── ...
+│   │   └── types/       # TypeScript type definitions
 │   └── .env.example     # Environment variables template
 ├── database/            # Database schemas and migrations
 │   └── DATABASE_DESIGN.sql
@@ -159,7 +159,7 @@ fashion-e-commerce/
    cd frontend
    npm run dev
    ```
-4. **Access Application:** http://localhost:5173
+4. **Access Application:** http://localhost:3000
 
 ### Making Changes
 
@@ -213,9 +213,10 @@ DB_SSLMODE=disable
 APP_ENV=development
 ```
 
-### Frontend (.env)
+### Frontend (.env.local)
 ```env
-VITE_API_BASE_URL=http://localhost:8080/api/v1
+NEXT_PUBLIC_API_URL=http://localhost:8080/api/v1
+NEXT_PUBLIC_UPLOAD_URL=http://localhost:8080/uploads
 ```
 
 ## 🐛 Troubleshooting
@@ -310,14 +311,14 @@ MOMO_ENDPOINT=https://test-payment.momo.vn/v2/gateway/api/create
 MOMO_RETURN_URL=http://localhost:8080/api/payments/momo/return
 ```
 
-**Frontend:** Tạo file `frontend/.env`:
+**Frontend:** Tạo file `frontend/.env.local`:
 
 ```env
 # API Base URL
-VITE_API_URL=http://localhost:8080/api
+NEXT_PUBLIC_API_URL=http://localhost:8080/api
 
 # Upload URL
-VITE_UPLOAD_URL=http://localhost:8080/uploads
+NEXT_PUBLIC_UPLOAD_URL=http://localhost:8080/uploads
 ```
 
 ### 5. Chạy migration
