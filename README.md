@@ -34,20 +34,219 @@ Xây dựng một hệ thống website bán hàng thời trang hoàn chỉnh v�
 - PostgreSQL 15 trở lên
 - Git
 
-## 🚀 Cài đặt và chạy project
+## 🚀 Quick Start
 
-### 1. Clone repository
+### Prerequisites
+
+- Go 1.21 or higher
+- Node.js 18+ and npm/yarn
+- PostgreSQL 15 or higher
+- Git
+
+### 1. Clone Repository
 
 ```bash
 git clone <repository-url>
 cd fashion-e-commerce
 ```
 
-### 2. Cài đặt dependencies
+### 2. Database Setup
 
-**Backend:**
+Create the PostgreSQL database:
+
+```bash
+# Connect to PostgreSQL
+psql -U postgres
+
+# Create database
+CREATE DATABASE fashion_ecommerce;
+
+# Exit
+\q
+
+# Run database schema
+psql -U postgres -d fashion_ecommerce -f database/DATABASE_DESIGN.sql
+```
+
+### 3. Backend Setup
+
 ```bash
 cd backend
+
+# Copy environment file
+cp .env.example .env
+
+# Edit .env and configure your database credentials
+# DB_HOST, DB_PORT, DB_USER, DB_PASSWORD, DB_NAME
+
+# Install dependencies (if Go is installed)
+go mod download
+
+# Run the server
+go run cmd/server/main.go
+```
+
+Backend will start at: **http://localhost:8080**
+
+Test health endpoint:
+```bash
+curl http://localhost:8080/health
+```
+
+See [backend/README.md](backend/README.md) for detailed setup instructions.
+
+### 4. Frontend Setup
+
+```bash
+cd frontend
+
+# Copy environment file
+cp .env.example .env
+
+# Install dependencies
+npm install
+
+# Start development server
+npm run dev
+```
+
+Frontend will start at: **http://localhost:5173**
+
+See [frontend/README.md](frontend/README.md) for detailed setup instructions.
+
+## 📁 Project Structure
+
+```
+fashion-e-commerce/
+├── backend/              # Go backend server
+│   ├── cmd/
+│   │   └── server/      # Application entry point
+│   ├── internal/
+│   │   ├── config/      # Configuration management
+│   │   ├── database/    # Database connection
+│   │   ├── handlers/    # HTTP handlers
+│   │   ├── middleware/  # Middleware (CORS, logging, auth)
+│   │   ├── models/      # Data models
+│   │   ├── repositories/# Data access layer
+│   │   └── services/    # Business logic
+│   └── .env.example     # Environment variables template
+├── frontend/            # React frontend application
+│   ├── src/
+│   │   ├── components/  # React components
+│   │   ├── pages/       # Page components
+│   │   ├── routes/      # Route configuration
+│   │   ├── services/    # API services
+│   │   └── ...
+│   └── .env.example     # Environment variables template
+├── database/            # Database schemas and migrations
+│   └── DATABASE_DESIGN.sql
+├── docs/                # Documentation
+└── openspec/            # OpenSpec change proposals
+```
+
+## 🔧 Development Workflow
+
+### Running Full Stack
+
+1. **Start PostgreSQL** (if not running)
+2. **Terminal 1 - Backend:**
+   ```bash
+   cd backend
+   go run cmd/server/main.go
+   ```
+3. **Terminal 2 - Frontend:**
+   ```bash
+   cd frontend
+   npm run dev
+   ```
+4. **Access Application:** http://localhost:5173
+
+### Making Changes
+
+- Backend code is in `backend/internal/`
+- Frontend code is in `frontend/src/`
+- Database schema is in `database/DATABASE_DESIGN.sql`
+- Create feature branches from `main` for new features
+
+## 📚 Documentation
+
+- [Backend README](backend/README.md) - Backend setup and API documentation
+- [Frontend README](frontend/README.md) - Frontend setup and development guide
+- [Database Design](database/DATABASE_DESIGN.sql) - Database schema
+- [Thesis Documentation](docs/THESIS_DOCUMENTATION.md) - Full project documentation
+- [OpenSpec Guide](openspec/AGENTS.md) - Change proposal workflow
+
+## 🎨 Features (Planned)
+
+### Customer Features
+- Browse products by category
+- Search and filter products
+- Product detail view
+- Shopping cart management
+- User authentication (register/login)
+- Order placement and tracking
+- Multiple payment methods (COD, VNPay, MoMo)
+- User profile and address management
+- Order history
+- Product reviews and ratings
+
+### Admin Features
+- Product management (CRUD)
+- Category management
+- Order management and processing
+- User management
+- Sales analytics and reports
+- Inventory management
+
+## 🔐 Environment Variables
+
+### Backend (.env)
+```env
+SERVER_PORT=8080
+GIN_MODE=debug
+DB_HOST=localhost
+DB_PORT=5432
+DB_USER=postgres
+DB_PASSWORD=postgres
+DB_NAME=fashion_ecommerce
+DB_SSLMODE=disable
+APP_ENV=development
+```
+
+### Frontend (.env)
+```env
+VITE_API_BASE_URL=http://localhost:8080/api/v1
+```
+
+## 🐛 Troubleshooting
+
+### Backend Issues
+
+- **Database connection failed**: Verify PostgreSQL is running and credentials are correct
+- **Port already in use**: Change `SERVER_PORT` in `.env` or kill the process using port 8080
+- See [backend/README.md](backend/README.md) for more troubleshooting
+
+### Frontend Issues
+
+- **CORS errors**: Ensure backend is running and CORS is properly configured
+- **Module not found**: Run `npm install` to install dependencies
+- See [frontend/README.md](frontend/README.md) for more troubleshooting
+
+## 📝 API Endpoints
+
+### Current Endpoints
+
+- `GET /health` - Health check endpoint
+- `GET /api/v1/health` - API health check
+
+### Planned Endpoints
+
+- `/api/v1/auth/*` - Authentication
+- `/api/v1/products/*` - Product management
+- `/api/v1/cart/*` - Shopping cart
+- `/api/v1/orders/*` - Order management
+- `/api/v1/users/*` - User management
+- `/api/v1/admin/*` - Admin operations
 go mod download
 ```
 
