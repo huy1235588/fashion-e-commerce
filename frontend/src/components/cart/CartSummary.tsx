@@ -2,6 +2,7 @@ import { formatCurrency } from '@/lib/utils';
 
 interface CartSummaryProps {
     subtotal: number;
+    total?: number;
     shippingFee?: number;
     discount?: number;
     onCheckout?: () => void;
@@ -9,11 +10,12 @@ interface CartSummaryProps {
 
 export default function CartSummary({
     subtotal,
+    total,
     shippingFee = 0,
     discount = 0,
     onCheckout,
 }: CartSummaryProps) {
-    const total = subtotal + shippingFee - discount;
+    const finalTotal = total || (subtotal + shippingFee - discount);
 
     return (
         <div className="bg-white p-6 rounded-lg shadow">
@@ -43,7 +45,7 @@ export default function CartSummary({
             <div className="border-t pt-4 mb-4">
                 <div className="flex justify-between">
                     <span className="text-lg font-bold">Tổng cộng:</span>
-                    <span className="text-xl font-bold text-blue-600">{formatCurrency(total)}</span>
+                    <span className="text-xl font-bold text-blue-600">{formatCurrency(finalTotal)}</span>
                 </div>
             </div>
 

@@ -6,6 +6,7 @@ export interface CartItem {
     variant_id: number;
     quantity: number;
     price: number;
+    subtotal: number;
     created_at: string;
     updated_at: string;
     product?: {
@@ -26,6 +27,9 @@ export interface Cart {
     id: number;
     user_id: number;
     items: CartItem[];
+    subtotal: number;
+    total: number;
+    item_count: number;
     created_at: string;
     updated_at: string;
 }

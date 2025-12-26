@@ -4,18 +4,20 @@ import { useRouter } from 'next/navigation';
 import CartItem from '@/components/cart/CartItem';
 import CartSummary from '@/components/cart/CartSummary';
 import Loading from '@/components/common/Loading';
+import PrivateRoute from '@/components/auth/PrivateRoute';
 import { useCart } from '@/hooks/useCart';
-import { useAuth } from '@/hooks/useAuth';
 
 export default function CartPage() {
-    const router = useRouter();
-    const { isAuthenticated } = useAuth();
-    const { items, isLoading, totalPrice, updateCartItem, removeCartItem } = useCart();
+    return (
+        <PrivateRoute>
+            <CartPageContent />
+        </PrivateRoute>
+    );
+}
 
-    if (!isAuthenticated) {
-        router.push('/login');
-        return null;
-    }
+function CartPageContent() {
+    const router = useRouter();
+    const { items, isLoading, subtotal, totalPrice, updateCartItem, removeCartItem } = useCart();
 
     if (isLoading) return <Loading />;
 
@@ -54,7 +56,8 @@ export default function CartPage() {
 
                 <div className="lg:col-span-1">
                     <CartSummary
-                        subtotal={totalPrice}
+                        subtotal={subtotal}
+                        total={totalPrice}
                         onCheckout={() => router.push('/checkout')}
                     />
                 </div>

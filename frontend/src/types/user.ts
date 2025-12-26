@@ -26,16 +26,3 @@ export interface AuthResponse {
     user: User;
     token: string;
 }
-
-export interface Address {
-    id: number;
-    user_id: number;
-    full_name: string;
-    phone: string;
-    province: string;
-    district: string;
-    ward: string;
-    detail_address: string;
-    is_default: boolean;
-    created_at: string;
-}

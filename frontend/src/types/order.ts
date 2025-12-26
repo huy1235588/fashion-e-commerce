@@ -1,33 +1,37 @@
 // Order Types
 export type OrderStatus = 'pending' | 'processing' | 'shipping' | 'delivered' | 'cancelled';
 export type PaymentMethod = 'cod' | 'vnpay' | 'momo';
-export type PaymentStatus = 'pending' | 'paid' | 'failed';
+export type PaymentStatus = 'pending' | 'paid' | 'failed' | 'refunded';
 
 export interface Order {
     id: number;
-    user_id: number;
     order_code: string;
-    total_amount: number;
-    shipping_fee: number;
-    discount_amount: number;
-    final_amount: number;
+    user_id: number;
+    status: OrderStatus;
     payment_method: PaymentMethod;
     payment_status: PaymentStatus;
-    status: OrderStatus;
+    subtotal_amount: number;
+    shipping_fee: number;
+    total_amount: number;
     note?: string;
+    cancel_reason?: string;
+    shipping_full_name: string;
+    shipping_phone: string;
+    shipping_province: string;
+    shipping_district: string;
+    shipping_ward: string;
+    shipping_detail_address: string;
+    order_items?: OrderItem[];
     created_at: string;
     updated_at: string;
-    items?: OrderItem[];
-    shipping_address?: ShippingAddress;
 }
 
 export interface OrderItem {
     id: number;
-    order_id: number;
     product_id: number;
-    variant_id: number;
+    variant_id?: number;
     product_name: string;
-    variant_info: string;
+    variant_name?: string;
     quantity: number;
     price: number;
     subtotal: number;
@@ -64,4 +68,12 @@ export interface OrderListResponse {
     page: number;
     limit: number;
     total_pages: number;
+}
+
+export interface CancelOrderRequest {
+    reason: string;
+}
+
+export interface UpdateOrderStatusRequest {
+    status: OrderStatus;
 }

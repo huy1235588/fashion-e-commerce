@@ -31,6 +31,17 @@ export default function Header() {
                                         </span>
                                     )}
                                 </Link>
+                                <Link href="/orders" className="text-gray-700 hover:text-gray-900">
+                                    Đơn hàng
+                                </Link>
+                                <Link href="/addresses" className="text-gray-700 hover:text-gray-900">
+                                    Địa chỉ
+                                </Link>
+                                {user?.role === 'admin' && (
+                                    <Link href="/admin/dashboard" className="text-purple-600 hover:text-purple-700 font-medium">
+                                        Quản trị
+                                    </Link>
+                                )}
                                 <Link href="/profile" className="text-gray-700 hover:text-gray-900">
                                     {user?.full_name}
                                 </Link>
