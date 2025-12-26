@@ -33,7 +33,9 @@ type DatabaseConfig struct {
 
 // AppConfig holds application-level configuration
 type AppConfig struct {
-	Environment string
+	Environment    string
+	JWTSecret      string
+	JWTExpiresHours int
 }
 
 // Load loads configuration from environment variables
@@ -55,7 +57,9 @@ func Load() (*Config, error) {
 			SSLMode:  getEnv("DB_SSLMODE", "disable"),
 		},
 		App: AppConfig{
-			Environment: getEnv("APP_ENV", "development"),
+			Environment:     getEnv("APP_ENV", "development"),
+			JWTSecret:       getEnv("JWT_SECRET", "your-secret-key-change-in-production"),
+			JWTExpiresHours: getEnvAsInt("JWT_EXPIRES_HOURS", 24),
 		},
 	}
 

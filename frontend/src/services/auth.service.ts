@@ -33,8 +33,8 @@ export const authService = {
         await apiClient.post(API_ENDPOINTS.FORGOT_PASSWORD, { email });
     },
 
-    async resetPassword(token: string, password: string): Promise<void> {
-        await apiClient.post(API_ENDPOINTS.RESET_PASSWORD, { token, password });
+    async resetPassword(code: string, password: string): Promise<void> {
+        await apiClient.post(API_ENDPOINTS.RESET_PASSWORD, { code, password });
     },
 
     async getProfile(): Promise<User> {

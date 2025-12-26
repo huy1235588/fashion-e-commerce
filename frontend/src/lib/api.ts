@@ -53,21 +53,28 @@ class ApiClient {
 
     private getToken(): string | null {
         if (typeof window !== 'undefined') {
-            return localStorage.getItem('auth_token');
+            // Get token from Zustand store (persisted in localStorage)
+            const storage = localStorage.getItem('auth-storage');
+            if (storage) {
+                try {
+                    const parsed = JSON.parse(storage);
+                    return parsed.state?.token || null;
+                } catch {
+                    return null;
+                }
+            }
         }
         return null;
     }
 
     public setToken(token: string): void {
-        if (typeof window !== 'undefined') {
-            localStorage.setItem('auth_token', token);
-        }
+        // Token is managed by Zustand auth store
+        // This method is kept for compatibility
     }
 
     public clearToken(): void {
-        if (typeof window !== 'undefined') {
-            localStorage.removeItem('auth_token');
-        }
+        // Token clearing is managed by Zustand auth store
+        // This method is kept for compatibility
     }
 
     public async get<T = any>(

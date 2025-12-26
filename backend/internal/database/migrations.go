@@ -1,11 +1,34 @@
 package database
 
-// migrations.go - Stub file for future migration framework
-// This file will be used to implement database migration functionality
-// when we add a migration tool like golang-migrate or GORM AutoMigrate
+import (
+	"log"
 
-// TODO: Implement migration framework in a future change
-// Possible approaches:
-// - golang-migrate/migrate for SQL-based migrations
-// - GORM AutoMigrate for development
-// - Custom migration system
+	"github.com/huy1235588/fashion-e-commerce/internal/models"
+)
+
+// RunMigrations runs database auto-migrations for all models
+func RunMigrations() error {
+	log.Println("Running database migrations...")
+
+	if DB == nil {
+		return nil
+	}
+
+	// Auto-migrate all models
+	err := DB.AutoMigrate(
+		&models.User{},
+		&models.PasswordResetCode{},
+		&models.Category{},
+		&models.Product{},
+		&models.ProductImage{},
+		&models.ProductVariant{},
+	)
+
+	if err != nil {
+		log.Printf("Migration failed: %v", err)
+		return err
+	}
+
+	log.Println("Database migrations completed successfully")
+	return nil
+}

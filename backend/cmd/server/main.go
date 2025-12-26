@@ -15,6 +15,9 @@ import (
 	"github.com/huy1235588/fashion-e-commerce/internal/database"
 	"github.com/huy1235588/fashion-e-commerce/internal/handlers"
 	"github.com/huy1235588/fashion-e-commerce/internal/middleware"
+	"github.com/huy1235588/fashion-e-commerce/internal/repositories"
+	"github.com/huy1235588/fashion-e-commerce/internal/services"
+	"github.com/huy1235588/fashion-e-commerce/internal/utils"
 )
 
 func main() {
@@ -33,6 +36,36 @@ func main() {
 	}
 	defer database.Close()
 
+	// Run database migrations
+	if err := database.RunMigrations(); err != nil {
+		log.Fatalf("Failed to run migrations: %v", err)
+	}
+
+	// Get database instance
+	db := database.GetDB()
+
+	// Initialize JWT utility
+	jwtUtil := utils.NewJWTUtil(cfg.App.JWTSecret, time.Duration(cfg.App.JWTExpiresHours)*time.Hour)
+
+	// Initialize repositories
+	userRepo := repositories.NewUserRepository(db)
+	resetCodeRepo := repositories.NewPasswordResetCodeRepository(db)
+	categoryRepo := repositories.NewCategoryRepository(db)
+	productRepo := repositories.NewProductRepository(db)
+
+	// Initialize services
+	authService := services.NewAuthService(userRepo, resetCodeRepo, jwtUtil)
+	categoryService := services.NewCategoryService(categoryRepo)
+	productService := services.NewProductService(productRepo, categoryRepo)
+
+	// Initialize middleware
+	authMiddleware := middleware.NewAuthMiddleware(jwtUtil)
+
+	// Initialize handlers
+	authHandler := handlers.NewAuthHandler(authService)
+	categoryHandler := handlers.NewCategoryHandler(categoryService)
+	productHandler := handlers.NewProductHandler(productService)
+
 	// Initialize Gin router
 	router := gin.New()
 
@@ -44,7 +77,71 @@ func main() {
 	// Register routes
 	api := router.Group("/api/v1")
 	{
+		// Public health check
 		api.GET("/health", handlers.Health)
+
+		// Auth routes (public)
+		auth := api.Group("/auth")
+		{
+			auth.POST("/register", authHandler.Register)
+			auth.POST("/login", authHandler.Login)
+			auth.POST("/forgot-password", authHandler.SendResetCode)
+			auth.POST("/reset-password", authHandler.ResetPassword)
+
+			// Protected auth routes
+			authProtected := auth.Group("")
+			authProtected.Use(authMiddleware.ValidateJWT())
+			{
+				authProtected.GET("/profile", authHandler.GetProfile)
+				authProtected.PUT("/profile", authHandler.UpdateProfile)
+			}
+		}
+
+		// Category routes (public read, admin write)
+		categories := api.Group("/categories")
+		{
+			categories.GET("", categoryHandler.ListCategories)
+			categories.GET("/:id", categoryHandler.GetCategory)
+			categories.GET("/slug/:slug", categoryHandler.GetCategoryBySlug)
+		}
+
+		// Product routes (public read, admin write)
+		products := api.Group("/products")
+		{
+			products.GET("", productHandler.ListProducts)
+			products.GET("/:id", productHandler.GetProduct)
+			products.GET("/slug/:slug", productHandler.GetProductBySlug)
+		}
+
+		// Admin routes
+		admin := api.Group("/admin")
+		admin.Use(authMiddleware.ValidateJWT(), authMiddleware.RequireAdmin())
+		{
+			// Category management
+			adminCategories := admin.Group("/categories")
+			{
+				adminCategories.POST("", categoryHandler.CreateCategory)
+				adminCategories.PUT("/:id", categoryHandler.UpdateCategory)
+				adminCategories.DELETE("/:id", categoryHandler.DeleteCategory)
+			}
+
+			// Product management
+			adminProducts := admin.Group("/products")
+			{
+				adminProducts.POST("", productHandler.CreateProduct)
+				adminProducts.PUT("/:id", productHandler.UpdateProduct)
+				adminProducts.DELETE("/:id", productHandler.DeleteProduct)
+				
+				// Product images
+				adminProducts.POST("/:id/images", productHandler.AddProductImage)
+				adminProducts.DELETE("/:id/images/:image_id", productHandler.DeleteProductImage)
+				
+				// Product variants
+				adminProducts.POST("/:id/variants", productHandler.AddProductVariant)
+				adminProducts.PUT("/:id/variants/:variant_id", productHandler.UpdateProductVariant)
+				adminProducts.DELETE("/:id/variants/:variant_id", productHandler.DeleteProductVariant)
+			}
+		}
 	}
 
 	// Also register health check at root for convenience

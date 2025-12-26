@@ -109,6 +109,11 @@ func Close() error {
 	return nil
 }
 
+// GetDB returns the database instance
+func GetDB() *gorm.DB {
+	return DB
+}
+
 // Health checks the database health status
 func Health() error {
 	if DB == nil {

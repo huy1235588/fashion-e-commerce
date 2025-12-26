@@ -8,9 +8,9 @@ export const API_ENDPOINTS = {
     LOGOUT: '/auth/logout',
     FORGOT_PASSWORD: '/auth/forgot-password',
     RESET_PASSWORD: '/auth/reset-password',
+    PROFILE: '/auth/profile',
 
     // User
-    PROFILE: '/users/profile',
     ADDRESSES: '/users/addresses',
 
     // Products
