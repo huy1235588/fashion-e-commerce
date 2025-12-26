@@ -13,6 +13,7 @@ type Config struct {
 	Server   ServerConfig
 	Database DatabaseConfig
 	App      AppConfig
+	Payment  PaymentConfig
 }
 
 // ServerConfig holds server-related configuration
@@ -38,6 +39,30 @@ type AppConfig struct {
 	JWTExpiresHours int
 }
 
+// PaymentConfig holds payment gateway configuration
+type PaymentConfig struct {
+	VNPay VNPayConfig
+	MoMo  MoMoConfig
+}
+
+// VNPayConfig holds VNPay configuration
+type VNPayConfig struct {
+	TmnCode    string
+	HashSecret string
+	PaymentURL string
+	ReturnURL  string
+}
+
+// MoMoConfig holds MoMo configuration
+type MoMoConfig struct {
+	PartnerCode string
+	AccessKey   string
+	SecretKey   string
+	PaymentURL  string
+	IPNUrl      string
+	ReturnURL   string
+}
+
 // Load loads configuration from environment variables
 func Load() (*Config, error) {
 	// Load .env file if it exists (ignore error if not found)
@@ -61,16 +86,30 @@ func Load() (*Config, error) {
 			JWTSecret:       getEnv("JWT_SECRET", "your-secret-key-change-in-production"),
 			JWTExpiresHours: getEnvAsInt("JWT_EXPIRES_HOURS", 24),
 		},
-	}
+		Payment: PaymentConfig{
+			VNPay: VNPayConfig{
+				TmnCode:    getEnv("VNPAY_TMN_CODE", ""),
+				HashSecret: getEnv("VNPAY_HASH_SECRET", ""),
+				PaymentURL: getEnv("VNPAY_PAYMENT_URL", "https://sandbox.vnpayment.vn/paymentv2/vpcpay.html"),
+				ReturnURL:  getEnv("VNPAY_RETURN_URL", "http://localhost:3000/payment/vnpay/return"),
+			},
+			MoMo: MoMoConfig{
+				PartnerCode: getEnv("MOMO_PARTNER_CODE", ""),
+				AccessKey:   getEnv("MOMO_ACCESS_KEY", ""),
+				SecretKey:   getEnv("MOMO_SECRET_KEY", ""),
+				PaymentURL:  getEnv("MOMO_PAYMENT_URL", "https://test-payment.momo.vn/v2/gateway/api/create"),
+				IPNUrl:      getEnv("MOMO_IPN_URL", "http://localhost:8080/api/payments/momo/ipn"),
+				ReturnURL:   getEnv("MOMO_RETURN_URL", "http://localhost:3000/payment/momo/return"),
+			},
+		},}
 
-	// Validate required configuration
-	if err := config.Validate(); err != nil {
-		return nil, err
-	}
-
-	return config, nil
+// Validate required configuration
+if err := config.Validate(); err != nil {
+	return nil, err
 }
 
+return config, nil
+}
 // Validate validates the configuration
 func (c *Config) Validate() error {
 	if c.Database.Host == "" {

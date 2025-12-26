@@ -69,8 +69,20 @@ func (h *AuthHandler) Register(c *gin.Context) {
 		return
 	}
 
+	// Auto-login: generate token for newly registered user
+	_, token, err := h.authService.Login(req.Email, req.Password)
+	if err != nil {
+		// Registration succeeded but auto-login failed
+		c.JSON(http.StatusCreated, gin.H{
+			"message": "User registered successfully. Please login.",
+			"user":    user.ToResponse(),
+		})
+		return
+	}
+
 	c.JSON(http.StatusCreated, gin.H{
 		"message": "User registered successfully",
+		"token":   token,
 		"user":    user.ToResponse(),
 	})
 }

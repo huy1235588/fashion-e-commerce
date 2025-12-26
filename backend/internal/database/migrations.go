@@ -22,6 +22,13 @@ func RunMigrations() error {
 		&models.Product{},
 		&models.ProductImage{},
 		&models.ProductVariant{},
+		&models.Cart{},
+		&models.CartItem{},
+		&models.Address{},
+		&models.Order{},
+		&models.OrderItem{},
+		&models.Payment{},
+		&models.Review{},
 	)
 
 	if err != nil {

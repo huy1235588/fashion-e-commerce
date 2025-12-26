@@ -47,16 +47,44 @@ func main() {
 	// Initialize JWT utility
 	jwtUtil := utils.NewJWTUtil(cfg.App.JWTSecret, time.Duration(cfg.App.JWTExpiresHours)*time.Hour)
 
+	// Initialize payment helpers
+	vnpayHelper := utils.NewVNPayHelper(utils.VNPayConfig{
+		TmnCode:    cfg.Payment.VNPay.TmnCode,
+		HashSecret: cfg.Payment.VNPay.HashSecret,
+		PaymentURL: cfg.Payment.VNPay.PaymentURL,
+		ReturnURL:  cfg.Payment.VNPay.ReturnURL,
+	})
+
+	momoHelper := utils.NewMoMoHelper(utils.MoMoConfig{
+		PartnerCode: cfg.Payment.MoMo.PartnerCode,
+		AccessKey:   cfg.Payment.MoMo.AccessKey,
+		SecretKey:   cfg.Payment.MoMo.SecretKey,
+		PaymentURL:  cfg.Payment.MoMo.PaymentURL,
+		IPNUrl:      cfg.Payment.MoMo.IPNUrl,
+		ReturnURL:   cfg.Payment.MoMo.ReturnURL,
+	})
+
 	// Initialize repositories
 	userRepo := repositories.NewUserRepository(db)
 	resetCodeRepo := repositories.NewPasswordResetCodeRepository(db)
 	categoryRepo := repositories.NewCategoryRepository(db)
 	productRepo := repositories.NewProductRepository(db)
+	cartRepo := repositories.NewCartRepository(db)
+	addressRepo := repositories.NewAddressRepository(db)
+	orderRepo := repositories.NewOrderRepository(db)
+	paymentRepo := repositories.NewPaymentRepository(db)
+	reviewRepo := repositories.NewReviewRepository(db)
 
 	// Initialize services
 	authService := services.NewAuthService(userRepo, resetCodeRepo, jwtUtil)
 	categoryService := services.NewCategoryService(categoryRepo)
 	productService := services.NewProductService(productRepo, categoryRepo)
+	cartService := services.NewCartService(cartRepo, productRepo)
+	addressService := services.NewAddressService(addressRepo)
+	orderService := services.NewOrderService(orderRepo, cartRepo, addressRepo, productRepo, db)
+	paymentService := services.NewPaymentService(paymentRepo, orderRepo, vnpayHelper, momoHelper, db)
+	reviewService := services.NewReviewService(reviewRepo, orderRepo)
+	adminService := services.NewAdminService(db, userRepo, productRepo, orderRepo)
 
 	// Initialize middleware
 	authMiddleware := middleware.NewAuthMiddleware(jwtUtil)
@@ -65,6 +93,12 @@ func main() {
 	authHandler := handlers.NewAuthHandler(authService)
 	categoryHandler := handlers.NewCategoryHandler(categoryService)
 	productHandler := handlers.NewProductHandler(productService)
+	cartHandler := handlers.NewCartHandler(cartService)
+	addressHandler := handlers.NewAddressHandler(addressService)
+	orderHandler := handlers.NewOrderHandler(orderService)
+	paymentHandler := handlers.NewPaymentHandler(paymentService)
+	reviewHandler := handlers.NewReviewHandler(reviewService)
+	adminHandler := handlers.NewAdminHandler(adminService)
 
 	// Initialize Gin router
 	router := gin.New()
@@ -111,12 +145,87 @@ func main() {
 			products.GET("", productHandler.ListProducts)
 			products.GET("/:id", productHandler.GetProduct)
 			products.GET("/slug/:slug", productHandler.GetProductBySlug)
+			// Review routes for products (public read)
+			products.GET("/:id/reviews", reviewHandler.GetProductReviews)
+			products.GET("/:id/rating", reviewHandler.GetProductRating)
+		}
+
+		// Cart routes (protected)
+		cart := api.Group("/cart")
+		cart.Use(authMiddleware.ValidateJWT())
+		{
+			cart.GET("", cartHandler.GetCart)
+			cart.POST("/items", cartHandler.AddToCart)
+			cart.PUT("/items/:id", cartHandler.UpdateCartItem)
+			cart.DELETE("/items/:id", cartHandler.RemoveCartItem)
+			cart.POST("/clear", cartHandler.ClearCart)
+		}
+
+		// Address routes (protected)
+		addresses := api.Group("/addresses")
+		addresses.Use(authMiddleware.ValidateJWT())
+		{
+			addresses.GET("", addressHandler.ListAddresses)
+			addresses.GET("/:id", addressHandler.GetAddress)
+			addresses.POST("", addressHandler.CreateAddress)
+			addresses.PUT("/:id", addressHandler.UpdateAddress)
+			addresses.DELETE("/:id", addressHandler.DeleteAddress)
+			addresses.PUT("/:id/set-default", addressHandler.SetDefaultAddress)
+		}
+
+		// Order routes (protected)
+		orders := api.Group("/orders")
+		orders.Use(authMiddleware.ValidateJWT())
+		{
+			orders.POST("", orderHandler.CreateOrder)
+			orders.GET("", orderHandler.GetMyOrders)
+			orders.GET("/:id", orderHandler.GetOrderByID)
+			orders.POST("/:id/cancel", orderHandler.CancelOrder)
+		}
+
+		// Payment routes
+		payments := api.Group("/payments")
+		{
+			// Protected: initiate payment
+			payments.POST("/initiate", authMiddleware.ValidateJWT(), paymentHandler.InitiatePayment)
+
+			// Public: payment callbacks
+			payments.GET("/vnpay/callback", paymentHandler.VNPayCallback)
+			payments.GET("/vnpay/return", paymentHandler.VNPayReturn)
+			payments.POST("/momo/ipn", paymentHandler.MoMoCallback)
+			payments.GET("/momo/return", paymentHandler.MoMoReturn)
+		}
+
+		// Review routes (protected)
+		reviews := api.Group("/reviews")
+		reviews.Use(authMiddleware.ValidateJWT())
+		{
+			reviews.POST("", reviewHandler.CreateReview)
+			reviews.DELETE("/:id", reviewHandler.DeleteReview)
+		}
+
+		// User routes (protected)
+		users := api.Group("/users")
+		users.Use(authMiddleware.ValidateJWT())
+		{
+			users.GET("/me/reviews", reviewHandler.GetUserReviews)
 		}
 
 		// Admin routes
 		admin := api.Group("/admin")
 		admin.Use(authMiddleware.ValidateJWT(), authMiddleware.RequireAdmin())
 		{
+			// Dashboard
+			admin.GET("/dashboard/stats", adminHandler.GetDashboardStats)
+
+			// User management
+			admin.GET("/users", adminHandler.ListAllUsers)
+			admin.PUT("/users/:id/role", adminHandler.UpdateUserRole)
+
+			// Order management
+			admin.GET("/orders", adminHandler.ListAllOrders)
+			admin.PUT("/orders/:id/status", adminHandler.UpdateOrderStatus)
+
 			// Category management
 			adminCategories := admin.Group("/categories")
 			{
@@ -131,11 +240,11 @@ func main() {
 				adminProducts.POST("", productHandler.CreateProduct)
 				adminProducts.PUT("/:id", productHandler.UpdateProduct)
 				adminProducts.DELETE("/:id", productHandler.DeleteProduct)
-				
+
 				// Product images
 				adminProducts.POST("/:id/images", productHandler.AddProductImage)
 				adminProducts.DELETE("/:id/images/:image_id", productHandler.DeleteProductImage)
-				
+
 				// Product variants
 				adminProducts.POST("/:id/variants", productHandler.AddProductVariant)
 				adminProducts.PUT("/:id/variants/:variant_id", productHandler.UpdateProductVariant)
