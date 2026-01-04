@@ -139,7 +139,7 @@ export default function ProductDetailPage() {
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                 {/* Images */}
                 <div>
-                    <div className="relative h-96 lg:h-[500px] w-full mb-4 bg-gray-100 rounded-lg overflow-hidden">
+                    <div className="relative h-96 lg:h-125 w-full mb-4 bg-gray-100 rounded-lg overflow-hidden">
                         <Image
                             src={getImageUrl(images[selectedImage]?.image_url || primaryImage?.image_url || '/placeholder.png')}
                             alt={product.name}

@@ -19,7 +19,7 @@ export default function CartItem({ item, onUpdateQuantity, onRemove }: CartItemP
 
     return (
         <div className="flex items-center space-x-4 bg-white p-4 rounded-lg shadow">
-            <div className="relative h-24 w-24 flex-shrink-0">
+            <div className="relative h-24 w-24 shrink-0">
                 <Image
                     src={getImageUrl(imageUrl)}
                     alt={item.product?.name || 'Product'}

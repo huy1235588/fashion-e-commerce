@@ -3,15 +3,13 @@ const nextConfig = {
     images: {
         remotePatterns: [
             {
-                protocol: 'http',
-                hostname: 'localhost',
-                port: '8080',
-                pathname: '/uploads/**',
+                protocol: 'https',
+                hostname: '**', // Chấp nhận mọi domain dùng https
             },
             {
-                protocol: 'https',
-                hostname: 'images.unsplash.com',
-            }
+                protocol: 'http',
+                hostname: '**', // Chấp nhận mọi domain dùng http (bao gồm cả localhost)
+            },
         ],
     },
     env: {
