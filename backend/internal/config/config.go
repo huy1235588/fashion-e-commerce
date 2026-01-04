@@ -14,6 +14,8 @@ type Config struct {
 	Database DatabaseConfig
 	App      AppConfig
 	Payment  PaymentConfig
+	Email    EmailConfig
+	Upload   UploadConfig
 }
 
 // ServerConfig holds server-related configuration
@@ -63,6 +65,21 @@ type MoMoConfig struct {
 	ReturnURL   string
 }
 
+// EmailConfig holds email service configuration
+type EmailConfig struct {
+	Host     string
+	Port     int
+	Username string
+	Password string
+	FromName string
+}
+
+// UploadConfig holds file upload configuration
+type UploadConfig struct {
+	MaxFileSize int64
+	UploadDir   string
+}
+
 // Load loads configuration from environment variables
 func Load() (*Config, error) {
 	// Load .env file if it exists (ignore error if not found)
@@ -101,15 +118,28 @@ func Load() (*Config, error) {
 				IPNUrl:      getEnv("MOMO_IPN_URL", "http://localhost:8080/api/payments/momo/ipn"),
 				ReturnURL:   getEnv("MOMO_RETURN_URL", "http://localhost:3000/payment/momo/return"),
 			},
-		},}
+		},
+		Email: EmailConfig{
+			Host:     getEnv("SMTP_HOST", "smtp.gmail.com"),
+			Port:     getEnvAsInt("SMTP_PORT", 587),
+			Username: getEnv("SMTP_USERNAME", ""),
+			Password: getEnv("SMTP_PASSWORD", ""),
+			FromName: getEnv("SMTP_FROM_NAME", "Fashion E-Commerce"),
+		},
+		Upload: UploadConfig{
+			MaxFileSize: getEnvAsInt64("UPLOAD_MAX_FILE_SIZE", 10*1024*1024), // 10MB default
+			UploadDir:   getEnv("UPLOAD_DIR", "./uploads"),
+		},
+	}
 
-// Validate required configuration
-if err := config.Validate(); err != nil {
-	return nil, err
+	// Validate required configuration
+	if err := config.Validate(); err != nil {
+		return nil, err
+	}
+
+	return config, nil
 }
 
-return config, nil
-}
 // Validate validates the configuration
 func (c *Config) Validate() error {
 	if c.Database.Host == "" {
@@ -143,6 +173,19 @@ func getEnvAsInt(key string, defaultValue int) int {
 		return defaultValue
 	}
 	value, err := strconv.Atoi(valueStr)
+	if err != nil {
+		return defaultValue
+	}
+	return value
+}
+
+// getEnvAsInt64 gets an environment variable as an int64 or returns a default value
+func getEnvAsInt64(key string, defaultValue int64) int64 {
+	valueStr := os.Getenv(key)
+	if valueStr == "" {
+		return defaultValue
+	}
+	value, err := strconv.ParseInt(valueStr, 10, 64)
 	if err != nil {
 		return defaultValue
 	}

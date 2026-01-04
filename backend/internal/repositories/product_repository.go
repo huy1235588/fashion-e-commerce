@@ -28,6 +28,7 @@ type ProductRepository interface {
 	// Image operations
 	CreateImage(image *models.ProductImage) error
 	DeleteImage(id uint) error
+	FindImageByID(id uint) (*models.ProductImage, error)
 	GetProductImages(productID uint) ([]models.ProductImage, error)
 	
 	// Variant operations
@@ -136,6 +137,14 @@ func (r *productRepository) CreateImage(image *models.ProductImage) error {
 
 func (r *productRepository) DeleteImage(id uint) error {
 	return r.db.Delete(&models.ProductImage{}, id).Error
+}
+
+func (r *productRepository) FindImageByID(id uint) (*models.ProductImage, error) {
+	var image models.ProductImage
+	if err := r.db.First(&image, id).Error; err != nil {
+		return nil, err
+	}
+	return &image, nil
 }
 
 func (r *productRepository) GetProductImages(productID uint) ([]models.ProductImage, error) {

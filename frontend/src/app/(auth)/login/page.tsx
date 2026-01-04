@@ -3,8 +3,8 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { useAuth } from '@/hooks/useAuth';
-
+import { useAuth } from '@/hooks/useAuth';import { toast } from '@/components/common/Toast';
+import ErrorMessage from '@/components/common/ErrorMessage';
 export default function LoginPage() {
     const router = useRouter();
     const { login, isLoading } = useAuth();
@@ -51,9 +51,14 @@ export default function LoginPage() {
                     </div>
 
                     <div>
-                        <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
-                            Mật khẩu
-                        </label>
+                        <div className="flex justify-between items-center mb-1">
+                            <label htmlFor="password" className="block text-sm font-medium text-gray-700">
+                                Mật khẩu
+                            </label>
+                            <Link href="/forgot-password" className="text-sm text-blue-600 hover:text-blue-800">
+                                Quên mật khẩu?
+                            </Link>
+                        </div>
                         <input
                             type="password"
                             id="password"

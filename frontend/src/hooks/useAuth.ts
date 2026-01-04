@@ -77,5 +77,6 @@ export function useAuth() {
         register: handleRegister,
         logout: handleLogout,
         refreshProfile,
+        setUser,
     };
 }

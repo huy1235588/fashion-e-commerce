@@ -28,11 +28,12 @@ type OrderService interface {
 }
 
 type orderService struct {
-	orderRepo   repositories.OrderRepository
-	cartRepo    repositories.CartRepository
-	addressRepo repositories.AddressRepository
-	productRepo repositories.ProductRepository
-	db          *gorm.DB
+	orderRepo    repositories.OrderRepository
+	cartRepo     repositories.CartRepository
+	addressRepo  repositories.AddressRepository
+	productRepo  repositories.ProductRepository
+	db           *gorm.DB
+	emailService *utils.EmailService
 }
 
 func NewOrderService(
@@ -41,13 +42,15 @@ func NewOrderService(
 	addressRepo repositories.AddressRepository,
 	productRepo repositories.ProductRepository,
 	db *gorm.DB,
+	emailService *utils.EmailService,
 ) OrderService {
 	return &orderService{
-		orderRepo:   orderRepo,
-		cartRepo:    cartRepo,
-		addressRepo: addressRepo,
-		productRepo: productRepo,
-		db:          db,
+		orderRepo:    orderRepo,
+		cartRepo:     cartRepo,
+		addressRepo:  addressRepo,
+		productRepo:  productRepo,
+		db:           db,
+		emailService: emailService,
 	}
 }
 
@@ -195,7 +198,19 @@ func (s *orderService) CreateFromCart(userID uint, req CreateOrderRequest) (*mod
 	}
 
 	// Reload order with relations
-	return s.orderRepo.FindByID(order.ID)
+	createdOrder, err := s.orderRepo.FindByID(order.ID)
+	if err != nil {
+		return nil, err
+	}
+
+	// Send confirmation email (best-effort)
+	if s.emailService != nil {
+		if err := s.emailService.SendOrderConfirmationEmail(createdOrder); err != nil {
+			fmt.Printf("Failed to send order confirmation email for order %s: %v\n", createdOrder.OrderCode, err)
+		}
+	}
+
+	return createdOrder, nil
 }
 
 func (s *orderService) GetOrderByID(id uint, userID uint) (*models.Order, error) {

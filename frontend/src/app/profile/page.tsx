@@ -5,6 +5,9 @@ import { useAuthStore } from '@/store/authStore';
 import { authService } from '@/services/auth.service';
 import PrivateRoute from '@/components/auth/PrivateRoute';
 import Loading from '@/components/common/Loading';
+import { toast } from '@/components/common/Toast';
+import ErrorMessage from '@/components/common/ErrorMessage';
+import { useRouter } from 'next/navigation';
 
 export default function ProfilePage() {
     return (
@@ -15,11 +18,11 @@ export default function ProfilePage() {
 }
 
 function ProfileContent() {
+    const router = useRouter();
     const { user, setUser } = useAuthStore();
     const [isEditing, setIsEditing] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState('');
-    const [success, setSuccess] = useState('');
     const [formData, setFormData] = useState({
         full_name: '',
         phone: '',
@@ -41,19 +44,29 @@ function ProfileContent() {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setError('');
-        setSuccess('');
         setIsLoading(true);
 
         try {
             const updatedUser = await authService.updateProfile(formData);
             setUser(updatedUser);
-            setSuccess('Cập nhật thông tin thành công');
+            toast.success('Cập nhật thông tin thành công');
             setIsEditing(false);
         } catch (err: any) {
             setError(err.response?.data?.message || 'Cập nhật thất bại');
         } finally {
             setIsLoading(false);
         }
+    };
+
+    const handleCancel = () => {
+        if (user) {
+            setFormData({
+                full_name: user.full_name || '',
+                phone: user.phone || '',
+            });
+        }
+        setIsEditing(false);
+        setError('');
     };
 
     if (!user) {
@@ -75,17 +88,7 @@ function ProfileContent() {
                     )}
                 </div>
 
-                {error && (
-                    <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
-                        {error}
-                    </div>
-                )}
-
-                {success && (
-                    <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4">
-                        {success}
-                    </div>
-                )}
+                <ErrorMessage message={error} className="mb-4" />
 
                 {isEditing ? (
                     <form onSubmit={handleSubmit} className="space-y-4">
@@ -153,53 +156,52 @@ function ProfileContent() {
                             </button>
                             <button
                                 type="button"
-                                onClick={() => {
-                                    setIsEditing(false);
-                                    setFormData({
-                                        full_name: user.full_name || '',
-                                        phone: user.phone || '',
-                                    });
-                                }}
-                                className="flex-1 bg-gray-300 text-gray-700 py-3 rounded-md hover:bg-gray-400 font-semibold"
+                                onClick={handleCancel}
+                                disabled={isLoading}
+                                className="flex-1 bg-gray-200 text-gray-700 py-3 rounded-md hover:bg-gray-300 font-semibold"
                             >
                                 Hủy
                             </button>
                         </div>
                     </form>
                 ) : (
-                    <div className="space-y-4">
+                    <div className="space-y-6">
                         <div>
                             <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
-                            <p className="text-gray-900">{user.email}</p>
+                            <div className="text-gray-900 py-2">{user.email}</div>
                         </div>
-
                         <div>
                             <label className="block text-sm font-medium text-gray-700 mb-1">Họ và tên</label>
-                            <p className="text-gray-900">{user.full_name}</p>
+                            <div className="text-gray-900 py-2">{user.full_name}</div>
                         </div>
-
                         <div>
                             <label className="block text-sm font-medium text-gray-700 mb-1">Số điện thoại</label>
-                            <p className="text-gray-900">{user.phone || 'Chưa cập nhật'}</p>
+                            <div className="text-gray-900 py-2">{user.phone || 'Chưa cập nhật'}</div>
                         </div>
-
                         <div>
                             <label className="block text-sm font-medium text-gray-700 mb-1">Vai trò</label>
-                            <p className="text-gray-900">{user.role === 'admin' ? 'Quản trị viên' : 'Khách hàng'}</p>
-                        </div>
-
-                        <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">Trạng thái</label>
-                            <p className="text-gray-900">
-                                {user.is_active ? (
-                                    <span className="text-green-600 font-semibold">Đang hoạt động</span>
-                                ) : (
-                                    <span className="text-red-600 font-semibold">Bị khóa</span>
-                                )}
-                            </p>
+                            <div className="text-gray-900 py-2">{user.role === 'admin' ? 'Quản trị viên' : 'Khách hàng'}</div>
                         </div>
                     </div>
                 )}
+
+                <div className="mt-8 pt-6 border-t border-gray-200">
+                    <h2 className="text-lg font-semibold text-gray-900 mb-4">Quản lý tài khoản</h2>
+                    <div className="space-y-3">
+                        <button
+                            onClick={() => router.push('/addresses')}
+                            className="w-full text-left px-4 py-3 bg-gray-50 hover:bg-gray-100 rounded-md text-gray-700"
+                        >
+                            Quản lý địa chỉ giao hàng
+                        </button>
+                        <button
+                            onClick={() => router.push('/orders')}
+                            className="w-full text-left px-4 py-3 bg-gray-50 hover:bg-gray-100 rounded-md text-gray-700"
+                        >
+                            Đơn hàng của tôi
+                        </button>
+                    </div>
+                </div>
             </div>
         </div>
     );

@@ -4,8 +4,9 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import PrivateRoute from '@/components/auth/PrivateRoute';
 import { useAuthStore } from '@/store/authStore';
-import { adminService } from '@/services/admin.service';
-import { DashboardStats } from '@/types/admin';
+import { statisticsService, DashboardStats } from '@/services/statistics.service';
+import Loading from '@/components/common/Loading';
+import ErrorMessage from '@/components/common/ErrorMessage';
 import { FiUsers, FiPackage, FiShoppingCart, FiDollarSign, FiTrendingUp, FiAlertTriangle } from 'react-icons/fi';
 
 export default function AdminDashboardPage() {
@@ -13,6 +14,7 @@ export default function AdminDashboardPage() {
     const { user } = useAuthStore();
     const [stats, setStats] = useState<DashboardStats | null>(null);
     const [loading, setLoading] = useState(true);
+    const [error, setError] = useState('');
 
     useEffect(() => {
         if (user && user.role !== 'admin') {
@@ -26,36 +28,30 @@ export default function AdminDashboardPage() {
     const loadStats = async () => {
         try {
             setLoading(true);
-            const data = await adminService.getDashboardStats();
+            setError('');
+            const data = await statisticsService.getDashboardStats();
             setStats(data);
-        } catch (err) {
+        } catch (err: any) {
             console.error('Failed to load stats:', err);
+            setError('Không thể tải thống kê');
         } finally {
             setLoading(false);
         }
     };
 
     if (loading) {
+        return <Loading />;
+    }
+
+    if (error) {
         return (
-            <div className="flex justify-center items-center min-h-screen">
-                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+            <div className="container mx-auto px-4 py-8">
+                <ErrorMessage message={error} />
             </div>
         );
     }
 
     if (!stats) return null;
-
-    const revenueGrowth = stats.revenue_last_month > 0
-        ? ((stats.revenue_this_month - stats.revenue_last_month) / stats.revenue_last_month * 100).toFixed(1)
-        : '0';
-
-    const ordersGrowth = stats.orders_last_month > 0
-        ? ((stats.orders_this_month - stats.orders_last_month) / stats.orders_last_month * 100).toFixed(1)
-        : '0';
-
-    const usersGrowth = stats.new_users_last_month > 0
-        ? ((stats.new_users_this_month - stats.new_users_last_month) / stats.new_users_last_month * 100).toFixed(1)
-        : '0';
 
     return (
         <PrivateRoute>
@@ -70,13 +66,10 @@ export default function AdminDashboardPage() {
                                 <h3 className="text-sm font-medium text-gray-600">Tổng Doanh Thu</h3>
                                 <FiDollarSign className="text-green-600 text-xl" />
                             </div>
-                            <p className="text-2xl font-bold text-gray-900">{stats.total_revenue.toLocaleString()}đ</p>
+                            <p className="text-2xl font-bold text-gray-900">{stats.total_revenue.toLocaleString()}₫</p>
                             <p className="text-sm text-gray-500 mt-1">
-                                Tháng này: {stats.revenue_this_month.toLocaleString()}đ
+                                Hôm nay: {stats.revenue_today.toLocaleString()}₫
                             </p>
-                            <div className={`text-xs mt-1 ${parseFloat(revenueGrowth) >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                                {parseFloat(revenueGrowth) >= 0 ? '↑' : '↓'} {Math.abs(parseFloat(revenueGrowth))}% so với tháng trước
-                            </div>
                         </div>
 
                         <div className="bg-white rounded-lg shadow p-6">
@@ -86,25 +79,16 @@ export default function AdminDashboardPage() {
                             </div>
                             <p className="text-2xl font-bold text-gray-900">{stats.total_orders.toLocaleString()}</p>
                             <p className="text-sm text-gray-500 mt-1">
-                                Tháng này: {stats.orders_this_month}
+                                Hôm nay: {stats.orders_today}
                             </p>
-                            <div className={`text-xs mt-1 ${parseFloat(ordersGrowth) >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                                {parseFloat(ordersGrowth) >= 0 ? '↑' : '↓'} {Math.abs(parseFloat(ordersGrowth))}% so với tháng trước
-                            </div>
                         </div>
 
                         <div className="bg-white rounded-lg shadow p-6">
                             <div className="flex items-center justify-between mb-2">
-                                <h3 className="text-sm font-medium text-gray-600">Người Dùng</h3>
+                                <h3 className="text-sm font-medium text-gray-600">Khách Hàng</h3>
                                 <FiUsers className="text-purple-600 text-xl" />
                             </div>
                             <p className="text-2xl font-bold text-gray-900">{stats.total_users.toLocaleString()}</p>
-                            <p className="text-sm text-gray-500 mt-1">
-                                Mới tháng này: {stats.new_users_this_month}
-                            </p>
-                            <div className={`text-xs mt-1 ${parseFloat(usersGrowth) >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                                {parseFloat(usersGrowth) >= 0 ? '↑' : '↓'} {Math.abs(parseFloat(usersGrowth))}% so với tháng trước
-                            </div>
                         </div>
 
                         <div className="bg-white rounded-lg shadow p-6">
@@ -113,71 +97,14 @@ export default function AdminDashboardPage() {
                                 <FiPackage className="text-orange-600 text-xl" />
                             </div>
                             <p className="text-2xl font-bold text-gray-900">{stats.total_products.toLocaleString()}</p>
-                            <p className="text-sm text-gray-500 mt-1">
-                                Tồn kho thấp: {stats.low_stock_products}
-                            </p>
-                            <p className="text-sm text-red-600 mt-1">
-                                Hết hàng: {stats.out_of_stock_products}
-                            </p>
-                        </div>
-                    </div>
-
-                    {/* Order Status */}
-                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-                        <div className="bg-white rounded-lg shadow p-6">
-                            <h2 className="text-lg font-semibold text-gray-900 mb-4">Trạng Thái Đơn Hàng</h2>
-                            <div className="space-y-3">
-                                <div className="flex justify-between items-center">
-                                    <span className="text-gray-600">Chờ xác nhận</span>
-                                    <span className="bg-yellow-100 text-yellow-800 px-3 py-1 rounded-full text-sm font-medium">
-                                        {stats.pending_orders}
-                                    </span>
-                                </div>
-                                <div className="flex justify-between items-center">
-                                    <span className="text-gray-600">Đang xử lý</span>
-                                    <span className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm font-medium">
-                                        {stats.processing_orders}
-                                    </span>
-                                </div>
-                                <div className="flex justify-between items-center">
-                                    <span className="text-gray-600">Đang giao</span>
-                                    <span className="bg-purple-100 text-purple-800 px-3 py-1 rounded-full text-sm font-medium">
-                                        {stats.shipping_orders}
-                                    </span>
-                                </div>
-                                <div className="flex justify-between items-center">
-                                    <span className="text-gray-600">Đã giao</span>
-                                    <span className="bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm font-medium">
-                                        {stats.delivered_orders}
-                                    </span>
-                                </div>
-                                <div className="flex justify-between items-center">
-                                    <span className="text-gray-600">Đã hủy</span>
-                                    <span className="bg-red-100 text-red-800 px-3 py-1 rounded-full text-sm font-medium">
-                                        {stats.cancelled_orders}
-                                    </span>
-                                </div>
-                            </div>
                         </div>
 
-                        <div className="bg-white rounded-lg shadow p-6">
-                            <h2 className="text-lg font-semibold text-gray-900 mb-4">Cảnh Báo Tồn Kho</h2>
-                            <div className="space-y-4">
-                                <div className="flex items-start gap-3 p-3 bg-yellow-50 rounded-lg">
-                                    <FiAlertTriangle className="text-yellow-600 mt-1" />
-                                    <div>
-                                        <p className="font-medium text-gray-900">Sản phẩm tồn kho thấp</p>
-                                        <p className="text-sm text-gray-600">{stats.low_stock_products} sản phẩm có số lượng dưới 10</p>
-                                    </div>
-                                </div>
-                                <div className="flex items-start gap-3 p-3 bg-red-50 rounded-lg">
-                                    <FiAlertTriangle className="text-red-600 mt-1" />
-                                    <div>
-                                        <p className="font-medium text-gray-900">Sản phẩm hết hàng</p>
-                                        <p className="text-sm text-gray-600">{stats.out_of_stock_products} sản phẩm đã hết hàng</p>
-                                    </div>
-                                </div>
+                        <div className="bg-white rounded-lg shadow p-6 md:col-span-2 lg:col-span-1">
+                            <div className="flex items-center justify-between mb-2">
+                                <h3 className="text-sm font-medium text-gray-600">Đơn Chờ Xử Lý</h3>
+                                <FiAlertTriangle className="text-yellow-600 text-xl" />
                             </div>
+                            <p className="text-2xl font-bold text-gray-900">{stats.pending_orders.toLocaleString()}</p>
                         </div>
                     </div>
 

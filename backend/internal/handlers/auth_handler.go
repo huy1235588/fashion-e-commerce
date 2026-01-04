@@ -5,6 +5,7 @@ import (
 
 	"github.com/huy1235588/fashion-e-commerce/internal/middleware"
 	"github.com/huy1235588/fashion-e-commerce/internal/services"
+	"github.com/huy1235588/fashion-e-commerce/internal/utils"
 
 	"github.com/gin-gonic/gin"
 )
@@ -12,11 +13,15 @@ import (
 // AuthHandler handles authentication endpoints
 type AuthHandler struct {
 	authService services.AuthService
+	validator   *utils.Validator
 }
 
 // NewAuthHandler creates a new auth handler
 func NewAuthHandler(authService services.AuthService) *AuthHandler {
-	return &AuthHandler{authService: authService}
+	return &AuthHandler{
+		authService: authService,
+		validator:   utils.NewValidator(),
+	}
 }
 
 // RegisterRequest represents registration request body
@@ -59,6 +64,26 @@ func (h *AuthHandler) Register(c *gin.Context) {
 			"error": err.Error(),
 		})
 		return
+	}
+
+	// Additional validation
+	if err := h.validator.ValidateEmail(req.Email); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	if err := h.validator.ValidatePassword(req.Password); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	if err := h.validator.ValidateFullName(req.FullName); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	if req.Phone != "" {
+		if err := h.validator.ValidateVietnamesePhone(req.Phone); err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+			return
+		}
 	}
 
 	user, err := h.authService.Register(req.Email, req.Password, req.FullName, req.Phone)
@@ -160,6 +185,17 @@ func (h *AuthHandler) UpdateProfile(c *gin.Context) {
 		return
 	}
 
+	if err := h.validator.ValidateFullName(req.FullName); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	if req.Phone != "" {
+		if err := h.validator.ValidateVietnamesePhone(req.Phone); err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+			return
+		}
+	}
+
 	user, err := h.authService.UpdateProfile(userID, req.FullName, req.Phone)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
@@ -185,6 +221,11 @@ func (h *AuthHandler) SendResetCode(c *gin.Context) {
 		return
 	}
 
+	if err := h.validator.ValidateEmail(req.Email); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
 	if err := h.authService.SendResetCode(req.Email); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"error": "Failed to send reset code",
@@ -205,6 +246,11 @@ func (h *AuthHandler) ResetPassword(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"error": err.Error(),
 		})
+		return
+	}
+
+	if err := h.validator.ValidatePassword(req.NewPassword); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 

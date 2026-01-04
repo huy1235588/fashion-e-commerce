@@ -28,14 +28,16 @@ type authService struct {
 	userRepo      repositories.UserRepository
 	resetCodeRepo repositories.PasswordResetCodeRepository
 	jwtUtil       *utils.JWTUtil
+	emailService  *utils.EmailService
 }
 
 // NewAuthService creates a new auth service
-func NewAuthService(userRepo repositories.UserRepository, resetCodeRepo repositories.PasswordResetCodeRepository, jwtUtil *utils.JWTUtil) AuthService {
+func NewAuthService(userRepo repositories.UserRepository, resetCodeRepo repositories.PasswordResetCodeRepository, jwtUtil *utils.JWTUtil, emailService *utils.EmailService) AuthService {
 	return &authService{
 		userRepo:      userRepo,
 		resetCodeRepo: resetCodeRepo,
 		jwtUtil:       jwtUtil,
+		emailService:  emailService,
 	}
 }
 
@@ -149,9 +151,13 @@ func (s *authService) SendResetCode(email string) error {
 		return err
 	}
 
-	// TODO: Send email with reset code
-	// For now, just log it (in production, integrate with email service)
-	fmt.Printf("Password reset code for %s: %s\n", email, code)
+	// Send email with reset code
+	if s.emailService != nil {
+		if err := s.emailService.SendPasswordResetEmail(email, code); err != nil {
+			// Log error but don't fail the request
+			fmt.Printf("Failed to send reset email to %s: %v\n", email, err)
+		}
+	}
 
 	return nil
 }

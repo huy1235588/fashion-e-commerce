@@ -3,8 +3,12 @@ package services
 import (
 	"errors"
 	"fmt"
+	"mime/multipart"
+	"strings"
+
 	"github.com/huy1235588/fashion-e-commerce/internal/models"
 	"github.com/huy1235588/fashion-e-commerce/internal/repositories"
+	"github.com/huy1235588/fashion-e-commerce/internal/utils"
 	"gorm.io/gorm"
 )
 
@@ -12,13 +16,15 @@ import (
 type ProductService struct {
 	productRepo  repositories.ProductRepository
 	categoryRepo repositories.CategoryRepository
+	uploadService *utils.UploadService
 }
 
 // NewProductService creates a new product service
-func NewProductService(productRepo repositories.ProductRepository, categoryRepo repositories.CategoryRepository) *ProductService {
+func NewProductService(productRepo repositories.ProductRepository, categoryRepo repositories.CategoryRepository, uploadService *utils.UploadService) *ProductService {
 	return &ProductService{
 		productRepo:  productRepo,
 		categoryRepo: categoryRepo,
+		uploadService: uploadService,
 	}
 }
 
@@ -119,6 +125,9 @@ func (s *ProductService) UpdateProduct(id uint, updates *models.Product) error {
 
 // DeleteProduct deletes a product
 func (s *ProductService) DeleteProduct(id uint) error {
+	if s.uploadService != nil {
+		_ = s.uploadService.DeleteProductImages(id)
+	}
 	return s.productRepo.Delete(id)
 }
 
@@ -144,9 +153,45 @@ func (s *ProductService) AddProductImage(productID uint, imageURL string, isPrim
 	return s.productRepo.CreateImage(image)
 }
 
+// AddProductImageWithFile uploads an image file then stores its record
+func (s *ProductService) AddProductImageWithFile(productID uint, file multipart.File, header *multipart.FileHeader, isPrimary bool) (string, error) {
+	if s.uploadService == nil {
+		return "", errors.New("upload service not configured")
+	}
+
+	// Verify product exists
+	if _, err := s.productRepo.FindByID(productID); err != nil {
+		return "", err
+	}
+
+	uploadedPath, err := s.uploadService.UploadImage(file, header, productID)
+	if err != nil {
+		return "", err
+	}
+
+	if err := s.AddProductImage(productID, uploadedPath, isPrimary); err != nil {
+		return "", err
+	}
+
+	return uploadedPath, nil
+}
+
 // DeleteProductImage deletes a product image
 func (s *ProductService) DeleteProductImage(imageID uint) error {
-	return s.productRepo.DeleteImage(imageID)
+	image, err := s.productRepo.FindImageByID(imageID)
+	if err != nil {
+		return err
+	}
+
+	if err := s.productRepo.DeleteImage(imageID); err != nil {
+		return err
+	}
+
+	if s.uploadService != nil && image.ImageURL != "" && !isExternalURL(image.ImageURL) {
+		_ = s.uploadService.DeleteImage(image.ImageURL)
+	}
+
+	return nil
 }
 
 // AddProductVariant adds a variant to a product
@@ -210,4 +255,9 @@ func (s *ProductService) UpdateProductVariant(id uint, updates *models.ProductVa
 // DeleteProductVariant deletes a product variant
 func (s *ProductService) DeleteProductVariant(id uint) error {
 	return s.productRepo.DeleteVariant(id)
+}
+
+// isExternalURL detects if the image path points to an external URL
+func isExternalURL(path string) bool {
+	return strings.HasPrefix(path, "http://") || strings.HasPrefix(path, "https://")
 }

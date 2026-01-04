@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import Header from "@/components/common/Header";
 import Footer from "@/components/common/Footer";
+import { ToastProvider } from "@/components/common/Toast";
 
 export const metadata: Metadata = {
     title: "Fashion Store - Thời trang cao cấp",
@@ -19,6 +20,7 @@ export default function RootLayout({
                 <Header />
                 <main className="flex-1">{children}</main>
                 <Footer />
+                <ToastProvider />
             </body>
         </html>
     );

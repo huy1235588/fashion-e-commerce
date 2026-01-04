@@ -6,6 +6,8 @@ import { addressService } from '@/services/address.service';
 import AddressCard from '@/components/address/AddressCard';
 import AddressForm from '@/components/address/AddressForm';
 import PrivateRoute from '@/components/auth/PrivateRoute';
+import ErrorMessage from '@/components/common/ErrorMessage';
+import { toast } from '@/components/common/Toast';
 import { FiPlus } from 'react-icons/fi';
 
 export default function AddressesPage() {
@@ -24,6 +26,7 @@ export default function AddressesPage() {
             setLoading(true);
             const data = await addressService.getAddresses();
             setAddresses(data);
+            setError('');
         } catch (err: any) {
             setError(err.response?.data?.error || 'Không thể tải danh sách địa chỉ');
         } finally {
@@ -34,6 +37,7 @@ export default function AddressesPage() {
     const handleCreate = async (data: any) => {
         await addressService.createAddress(data);
         setShowForm(false);
+        toast.success('Thêm địa chỉ thành công');
         loadAddresses();
     };
 
@@ -42,6 +46,7 @@ export default function AddressesPage() {
             await addressService.updateAddress(editingAddress.id, data);
             setShowForm(false);
             setEditingAddress(undefined);
+            toast.success('Cập nhật địa chỉ thành công');
             loadAddresses();
         }
     };
@@ -50,9 +55,10 @@ export default function AddressesPage() {
         if (confirm('Bạn có chắc chắn muốn xóa địa chỉ này?')) {
             try {
                 await addressService.deleteAddress(id);
+                toast.success('Đã xóa địa chỉ');
                 loadAddresses();
             } catch (err: any) {
-                alert(err.response?.data?.error || 'Không thể xóa địa chỉ');
+                toast.error(err.response?.data?.error || 'Không thể xóa địa chỉ');
             }
         }
     };
@@ -60,9 +66,10 @@ export default function AddressesPage() {
     const handleSetDefault = async (id: number) => {
         try {
             await addressService.setDefaultAddress(id);
+            toast.success('Đã đặt địa chỉ mặc định');
             loadAddresses();
         } catch (err: any) {
-            alert(err.response?.data?.error || 'Không thể đặt địa chỉ mặc định');
+            toast.error(err.response?.data?.error || 'Không thể đặt địa chỉ mặc định');
         }
     };
 
@@ -98,11 +105,7 @@ export default function AddressesPage() {
                     </button>
                 </div>
 
-                {error && (
-                    <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-6">
-                        {error}
-                    </div>
-                )}
+                {error && <ErrorMessage message={error} className="mb-6" />}
 
                 {addresses.length === 0 ? (
                     <div className="text-center py-12">

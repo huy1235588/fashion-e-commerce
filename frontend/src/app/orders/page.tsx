@@ -6,6 +6,7 @@ import { Order, OrderStatus } from '@/types';
 import { orderService } from '@/services/order.service';
 import OrderStatusBadge from '@/components/order/OrderStatusBadge';
 import PrivateRoute from '@/components/auth/PrivateRoute';
+import ErrorMessage from '@/components/common/ErrorMessage';
 import { FiPackage, FiClock, FiTruck, FiCheckCircle, FiXCircle } from 'react-icons/fi';
 
 const statusConfig = {
@@ -54,11 +55,7 @@ export default function OrdersPage() {
             <div className="max-w-6xl mx-auto px-4 py-8">
                 <h1 className="text-2xl font-bold text-gray-900 mb-6">Đơn hàng của tôi</h1>
 
-                {error && (
-                    <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-6">
-                        {error}
-                    </div>
-                )}
+                <ErrorMessage message={error} className="mb-6" />
 
                 {orders.length === 0 ? (
                     <div className="text-center py-12 bg-white rounded-lg shadow">

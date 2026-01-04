@@ -58,4 +58,8 @@ export const productService = {
         const response = await apiClient.get<{ data: Category }>(API_ENDPOINTS.CATEGORY_DETAIL(id));
         return response.data;
     },
+
+    async deleteProduct(id: number): Promise<void> {
+        await apiClient.delete(API_ENDPOINTS.PRODUCT_DETAIL(id));
+    },
 };

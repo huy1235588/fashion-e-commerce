@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+        }
+
+        .container {
+            max-width: 720px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f9f9f9;
+        }
+
+        .content {
+            background-color: white;
+            padding: 30px;
+            border-radius: 6px;
+        }
+
+        .order-code {
+            background-color: #2563eb;
+            color: white;
+            padding: 10px 20px;
+            text-align: center;
+            font-size: 18px;
+            font-weight: bold;
+            margin: 20px 0;
+            border-radius: 5px;
+        }
+
+        .info-section {
+            margin: 20px 0;
+            padding: 15px;
+            background-color: #f9fafb;
+            border-radius: 5px;
+        }
+
+        .info-label {
+            font-weight: bold;
+            color: #666;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+
+        th {
+            background-color: #f3f4f6;
+            padding: 10px;
+            text-align: left;
+            font-weight: bold;
+        }
+
+        td {
+            padding: 10px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .total-row {
+            font-weight: bold;
+            font-size: 16px;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 30px;
+            font-size: 12px;
+            color: #666;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="content">
+            <h2>Cảm ơn bạn đã đặt hàng!</h2>
+            <p>Xin chào <strong>{{.FullName}}</strong>,</p>
+            <p>Đơn hàng của bạn đã được tiếp nhận và đang được xử lý.</p>
+            <div class="order-code">Mã đơn hàng: {{.OrderCode}}</div>
+            <div class="info-section">
+                <p><span class="info-label">Trạng thái:</span> {{.Status}}</p>
+                <p><span class="info-label">Phương thức thanh toán:</span> {{.PaymentMethod}}</p>
+                <p><span class="info-label">Địa chỉ giao hàng:</span><br>{{.ShippingAddress}}</p>
+                <p><span class="info-label">Số điện thoại:</span> {{.ShippingPhone}}</p>
+            </div>
+            <h3>Chi tiết đơn hàng</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Sản phẩm</th>
+                        <th style="text-align: center;">Số lượng</th>
+                        <th style="text-align: right;">Đơn giá</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {{.ItemsHTML}}
+                    <tr class="total-row">
+                        <td colspan="2" style="text-align: right;">Tạm tính:</td>
+                        <td style="text-align: right;">{{.Subtotal}}</td>
+                    </tr>
+                    <tr class="total-row">
+                        <td colspan="2" style="text-align: right;">Phí vận chuyển:</td>
+                        <td style="text-align: right;">{{.ShippingFee}}</td>
+                    </tr>
+                    <tr class="total-row">
+                        <td colspan="2" style="text-align: right;">Tổng cộng:</td>
+                        <td style="text-align: right; color: #2563eb;">{{.TotalAmount}}</td>
+                    </tr>
+                </tbody>
+            </table>
+            <p>Chúng tôi sẽ thông báo cho bạn khi đơn hàng được xử lý và giao đến địa chỉ của bạn.</p>
+            <p>Nếu có bất kỳ thắc mắc nào, vui lòng liên hệ với chúng tôi.</p>
+        </div>
+        <div class="footer">
+            <p>© 2024 Fashion E-Commerce. All rights reserved.</p>
+        </div>
+    </div>
+</body>
+
+</html>

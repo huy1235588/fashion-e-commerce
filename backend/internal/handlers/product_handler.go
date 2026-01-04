@@ -234,6 +234,32 @@ func (h *ProductHandler) AddProductImage(c *gin.Context) {
 		return
 	}
 
+	// Prefer handling multipart upload when an image file is provided
+	if fileHeader, err := c.FormFile("image"); err == nil {
+		isPrimary := false
+		if primaryVal := c.DefaultPostForm("is_primary", "false"); primaryVal != "" {
+			primaryParsed, _ := strconv.ParseBool(primaryVal)
+			isPrimary = primaryParsed
+		}
+
+		file, err := fileHeader.Open()
+		if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "unable to read uploaded file"})
+			return
+		}
+		defer file.Close()
+
+		uploadedPath, err := h.service.AddProductImageWithFile(uint(id), file, fileHeader, isPrimary)
+		if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+			return
+		}
+
+		c.JSON(http.StatusCreated, gin.H{"message": "image uploaded successfully", "path": uploadedPath})
+		return
+	}
+
+	// Fallback to JSON payload for backward compatibility
 	var image models.ProductImage
 	if err := c.ShouldBindJSON(&image); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})

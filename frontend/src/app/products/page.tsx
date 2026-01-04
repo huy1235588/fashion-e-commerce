@@ -3,6 +3,8 @@
 import { useState, useEffect } from 'react';
 import ProductList from '@/components/product/ProductList';
 import Loading from '@/components/common/Loading';
+import ErrorMessage from '@/components/common/ErrorMessage';
+import Pagination from '@/components/common/Pagination';
 import { productService } from '@/services/product.service';
 import type { Product, Category } from '@/types';
 
@@ -69,7 +71,7 @@ export default function ProductsPage() {
     if (error) {
         return (
             <div className="container mx-auto px-4 py-12">
-                <div className="text-center text-red-600">{error}</div>
+                <ErrorMessage message={error} />
             </div>
         );
     }

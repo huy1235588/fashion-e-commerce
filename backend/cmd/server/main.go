@@ -47,6 +47,17 @@ func main() {
 	// Initialize JWT utility
 	jwtUtil := utils.NewJWTUtil(cfg.App.JWTSecret, time.Duration(cfg.App.JWTExpiresHours)*time.Hour)
 
+	// Initialize shared utilities
+	emailService := utils.NewEmailService(
+		cfg.Email.Host,
+		cfg.Email.Port,
+		cfg.Email.Username,
+		cfg.Email.Password,
+		cfg.Email.FromName,
+		"./internal/utils/templates",
+	)
+	uploadService := utils.NewUploadService(cfg.Upload.MaxFileSize, cfg.Upload.UploadDir)
+
 	// Initialize payment helpers
 	vnpayHelper := utils.NewVNPayHelper(utils.VNPayConfig{
 		TmnCode:    cfg.Payment.VNPay.TmnCode,
@@ -74,17 +85,19 @@ func main() {
 	orderRepo := repositories.NewOrderRepository(db)
 	paymentRepo := repositories.NewPaymentRepository(db)
 	reviewRepo := repositories.NewReviewRepository(db)
+	statsRepo := repositories.NewStatisticsRepository(db)
 
 	// Initialize services
-	authService := services.NewAuthService(userRepo, resetCodeRepo, jwtUtil)
+	authService := services.NewAuthService(userRepo, resetCodeRepo, jwtUtil, emailService)
 	categoryService := services.NewCategoryService(categoryRepo)
-	productService := services.NewProductService(productRepo, categoryRepo)
+	productService := services.NewProductService(productRepo, categoryRepo, uploadService)
 	cartService := services.NewCartService(cartRepo, productRepo)
 	addressService := services.NewAddressService(addressRepo)
-	orderService := services.NewOrderService(orderRepo, cartRepo, addressRepo, productRepo, db)
+	orderService := services.NewOrderService(orderRepo, cartRepo, addressRepo, productRepo, db, emailService)
 	paymentService := services.NewPaymentService(paymentRepo, orderRepo, vnpayHelper, momoHelper, db)
 	reviewService := services.NewReviewService(reviewRepo, orderRepo)
 	adminService := services.NewAdminService(db, userRepo, productRepo, orderRepo)
+	statisticsService := services.NewStatisticsService(statsRepo)
 
 	// Initialize middleware
 	authMiddleware := middleware.NewAuthMiddleware(jwtUtil)
@@ -99,6 +112,7 @@ func main() {
 	paymentHandler := handlers.NewPaymentHandler(paymentService)
 	reviewHandler := handlers.NewReviewHandler(reviewService)
 	adminHandler := handlers.NewAdminHandler(adminService)
+	statisticsHandler := handlers.NewStatisticsHandler(statisticsService)
 
 	// Initialize Gin router
 	router := gin.New()
@@ -217,6 +231,17 @@ func main() {
 		{
 			// Dashboard
 			admin.GET("/dashboard/stats", adminHandler.GetDashboardStats)
+
+			// Statistics routes
+			statistics := admin.Group("/statistics")
+			{
+				statistics.GET("/dashboard", statisticsHandler.GetDashboardStats)
+				statistics.GET("/revenue", statisticsHandler.GetRevenue)
+				statistics.GET("/products/top", statisticsHandler.GetTopProducts)
+				statistics.GET("/orders", statisticsHandler.GetOrderStats)
+				statistics.GET("/customers", statisticsHandler.GetCustomerStats)
+				statistics.GET("/categories/revenue", statisticsHandler.GetCategoryRevenue)
+			}
 
 			// User management
 			admin.GET("/users", adminHandler.ListAllUsers)
