@@ -113,6 +113,7 @@ func main() {
 	reviewHandler := handlers.NewReviewHandler(reviewService)
 	adminHandler := handlers.NewAdminHandler(adminService)
 	statisticsHandler := handlers.NewStatisticsHandler(statisticsService)
+	uploadHandler := handlers.NewUploadHandler(uploadService)
 
 	// Initialize Gin router
 	router := gin.New()
@@ -127,6 +128,13 @@ func main() {
 	{
 		// Public health check
 		api.GET("/health", handlers.Health)
+
+		// Upload routes (protected)
+		upload := api.Group("/upload")
+		upload.Use(authMiddleware.ValidateJWT())
+		{
+			upload.POST("/temp", uploadHandler.UploadTempImage)
+		}
 
 		// Auth routes (public)
 		auth := api.Group("/auth")
@@ -280,6 +288,9 @@ func main() {
 
 	// Also register health check at root for convenience
 	router.GET("/health", handlers.Health)
+
+	// Serve static files (uploaded images)
+	router.Static("/uploads", cfg.Upload.UploadDir)
 
 	// Create HTTP server
 	addr := fmt.Sprintf(":%d", cfg.Server.Port)

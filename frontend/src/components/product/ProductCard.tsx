@@ -19,7 +19,7 @@ export default function ProductCard({ product }: ProductCardProps) {
             <div className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow">
                 <div className="relative h-64 w-full">
                     <Image
-                        src={imageUrl}
+                        src={getImageUrl(imageUrl)}
                         alt={product.name}
                         fill
                         className="object-cover"

@@ -62,4 +62,76 @@ export const productService = {
     async deleteProduct(id: number): Promise<void> {
         await apiClient.delete(API_ENDPOINTS.PRODUCT_DETAIL(id));
     },
+
+    async createProduct(data: CreateProductRequest): Promise<Product> {
+        const response = await apiClient.post<{ data: Product }>(
+            API_ENDPOINTS.ADMIN_PRODUCTS,
+            data
+        );
+        return response.data;
+    },
+
+    async updateProduct(id: number, product: Partial<Product>): Promise<Product> {
+        const response = await apiClient.put<{ data: Product }>(
+            `${API_ENDPOINTS.ADMIN_PRODUCTS}/${id}`,
+            product
+        );
+        return response.data;
+    },
+
+    async addProductImage(productId: number, imageUrl: string, isPrimary: boolean): Promise<void> {
+        await apiClient.post(`${API_ENDPOINTS.ADMIN_PRODUCTS}/${productId}/images`, {
+            image_url: imageUrl,
+            is_primary: isPrimary,
+        });
+    },
+
+    async deleteProductImage(productId: number, imageId: number): Promise<void> {
+        await apiClient.delete(`${API_ENDPOINTS.ADMIN_PRODUCTS}/${productId}/images/${imageId}`);
+    },
+
+    async addProductVariant(productId: number, variant: {
+        size: string;
+        color: string;
+        stock_quantity: number;
+        sku: string;
+    }): Promise<void> {
+        await apiClient.post(`${API_ENDPOINTS.ADMIN_PRODUCTS}/${productId}/variants`, variant);
+    },
+
+    async updateProductVariant(productId: number, variantId: number, variant: {
+        size: string;
+        color: string;
+        stock_quantity: number;
+        sku: string;
+    }): Promise<void> {
+        await apiClient.put(`${API_ENDPOINTS.ADMIN_PRODUCTS}/${productId}/variants/${variantId}`, variant);
+    },
+
+    async deleteProductVariant(productId: number, variantId: number): Promise<void> {
+        await apiClient.delete(`${API_ENDPOINTS.ADMIN_PRODUCTS}/${productId}/variants/${variantId}`);
+    },
 };
+
+// Types for product creation
+export interface CreateProductRequest {
+    product: {
+        name: string;
+        description: string;
+        category_id: number;
+        price: number;
+        discount_price?: number;
+        slug: string;
+        is_active: boolean;
+    };
+    variants: Array<{
+        size: string;
+        color: string;
+        stock_quantity: number;
+        sku: string;
+    }>;
+    images: Array<{
+        image_url: string;
+        is_primary: boolean;
+    }>;
+}

@@ -2,6 +2,8 @@
 
 import { useState, useRef } from 'react';
 import { FiUpload, FiX, FiImage } from 'react-icons/fi';
+import { apiClient } from '@/lib/api';
+import { getImageUrl } from '@/lib/utils';
 
 interface ImageUploadProps {
     images: string[];
@@ -47,9 +49,25 @@ export default function ImageUpload({
                     continue;
                 }
 
-                // Create preview URL
-                const previewUrl = URL.createObjectURL(file);
-                newImages.push(previewUrl);
+                // Upload to server temporarily (to /uploads/temp)
+                const formData = new FormData();
+                formData.append('image', file);
+
+                try {
+                    const response = await apiClient.post<{ data: { path: string } }>('/upload/temp', formData, {
+                        headers: {
+                            'Content-Type': 'multipart/form-data',
+                        },
+                    });
+                    
+                    // Use server path instead of blob URL
+                    newImages.push(response.data.path);
+                } catch (uploadError) {
+                    console.error('Error uploading image:', uploadError);
+                    // Fallback to blob URL if upload fails
+                    const previewUrl = URL.createObjectURL(file);
+                    newImages.push(previewUrl);
+                }
             }
 
             onImagesChange([...images, ...newImages]);
@@ -116,7 +134,7 @@ export default function ImageUpload({
                             }`}
                         >
                             <img
-                                src={image}
+                                src={getImageUrl(image)}
                                 alt={`Product ${index + 1}`}
                                 className="w-full h-full object-cover"
                             />

@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { Product, ProductVariant, Category } from '@/types';
-import { productService } from '@/services/product.service';
+import { productService, CreateProductRequest } from '@/services/product.service';
 import ImageUpload from '@/components/common/ImageUpload';
 import Loading from '@/components/common/Loading';
 import ErrorMessage from '@/components/common/ErrorMessage';
@@ -152,25 +152,118 @@ export default function ProductForm({ product, mode }: ProductFormProps) {
         setError('');
 
         try {
-            // TODO: Implement actual API call when backend is ready
-            // For now, just show success message
-            toast.info('Tính năng đang phát triển - API chưa sẵn sàng');
-            console.log('Form data:', {
-                ...formData,
-                price: parseFloat(formData.price),
-                discount_price: formData.discount_price ? parseFloat(formData.discount_price) : null,
-                category_id: parseInt(formData.category_id),
-                images,
-                variants: variants.map(v => ({
-                    ...v,
-                    stock_quantity: parseInt(v.stock_quantity),
-                })),
-            });
+            // Generate slug from product name
+            const slug = formData.name
+                .toLowerCase()
+                .normalize('NFD')
+                .replace(/[\u0300-\u036f]/g, '')
+                .replace(/đ/g, 'd')
+                .replace(/[^a-z0-9]+/g, '-')
+                .replace(/^-+|-+$/g, '');
+
+            // Call appropriate API based on mode
+            if (mode === 'create') {
+                const createData: CreateProductRequest = {
+                    product: {
+                        name: formData.name,
+                        description: formData.description,
+                        category_id: parseInt(formData.category_id),
+                        price: parseFloat(formData.price),
+                        discount_price: formData.discount_price ? parseFloat(formData.discount_price) : undefined,
+                        slug: slug,
+                        is_active: formData.is_active,
+                    },
+                    variants: variants.map(v => ({
+                        size: v.size,
+                        color: v.color,
+                        stock_quantity: parseInt(v.stock_quantity),
+                        sku: v.sku || `${slug}-${v.size}-${v.color}`.toUpperCase(),
+                    })),
+                    images: images.map((url, index) => ({
+                        image_url: url,
+                        is_primary: index === 0,
+                    })),
+                };
+                await productService.createProduct(createData);
+                toast.success('Tạo sản phẩm thành công');
+            } else {
+                if (!product?.id) {
+                    throw new Error('Product ID is missing');
+                }
+                const updateData: Partial<Product> = {
+                    name: formData.name,
+                    description: formData.description,
+                    category_id: parseInt(formData.category_id),
+                    price: parseFloat(formData.price),
+                    discount_price: formData.discount_price ? parseFloat(formData.discount_price) : undefined,
+                    slug: slug,
+                    is_active: formData.is_active,
+                };
+                await productService.updateProduct(product.id, updateData);
+
+                // Update images
+                const existingImages = product.images || [];
+                const existingImageUrls = existingImages.map(img => img.image_url);
+                
+                // Delete removed images
+                for (const existingImage of existingImages) {
+                    if (!images.includes(existingImage.image_url)) {
+                        await productService.deleteProductImage(product.id, existingImage.id);
+                    }
+                }
+                
+                // Add new images
+                for (let i = 0; i < images.length; i++) {
+                    const imageUrl = images[i];
+                    if (!existingImageUrls.includes(imageUrl)) {
+                        await productService.addProductImage(product.id, imageUrl, i === 0);
+                    }
+                }
+
+                // Update variants
+                const existingVariants = product.variants || [];
+                
+                // Delete removed variants
+                for (const existingVariant of existingVariants) {
+                    const stillExists = variants.some(
+                        v => v.size === existingVariant.size && v.color === existingVariant.color
+                    );
+                    if (!stillExists) {
+                        await productService.deleteProductVariant(product.id, existingVariant.id);
+                    }
+                }
+                
+                // Update or add variants
+                for (const variant of variants) {
+                    const existingVariant = existingVariants.find(
+                        v => v.size === variant.size && v.color === variant.color
+                    );
+                    
+                    const variantData = {
+                        size: variant.size,
+                        color: variant.color,
+                        stock_quantity: parseInt(variant.stock_quantity),
+                        sku: variant.sku || `${slug}-${variant.size}-${variant.color}`.toUpperCase(),
+                    };
+                    
+                    if (existingVariant) {
+                        // Update existing variant
+                        await productService.updateProductVariant(product.id, existingVariant.id, variantData);
+                    } else {
+                        // Add new variant
+                        await productService.addProductVariant(product.id, variantData);
+                    }
+                }
+                
+                toast.success('Cập nhật sản phẩm thành công');
+            }
             
-            // router.push('/admin/products');
+            // Redirect to products list
+            router.push('/admin/products');
         } catch (err: any) {
-            setError(err.response?.data?.message || 'Có lỗi xảy ra');
-            toast.error('Có lỗi xảy ra');
+            const errorMessage = err.response?.data?.error || err.response?.data?.message || err.message || 'Có lỗi xảy ra';
+            setError(errorMessage);
+            toast.error(errorMessage);
         } finally {
             setSubmitting(false);
         }

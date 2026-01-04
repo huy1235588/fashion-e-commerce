@@ -12,6 +12,7 @@ import Pagination from '@/components/common/Pagination';
 import ConfirmDialog from '@/components/common/ConfirmDialog';
 import { toast } from '@/components/common/Toast';
 import { FiEdit2, FiTrash2, FiPlus, FiEye, FiSearch } from 'react-icons/fi';
+import { getImageUrl } from '@/lib/utils';
 
 export default function AdminProductsPage() {
     const router = useRouter();
@@ -175,10 +176,10 @@ export default function AdminProductsPage() {
                                                     </td>
                                                     <td className="px-6 py-4">
                                                         <div className="flex items-center gap-3">
-                                                            <div className="w-12 h-12 rounded-md overflow-hidden bg-gray-100 flex-shrink-0">
+                                                            <div className="w-12 h-12 rounded-md overflow-hidden bg-gray-100 shrink-0">
                                                                 {primaryImage ? (
                                                                     <img
-                                                                        src={primaryImage}
+                                                                        src={getImageUrl(primaryImage)}
                                                                         alt={product.name}
                                                                         className="w-full h-full object-cover"
                                                                     />
