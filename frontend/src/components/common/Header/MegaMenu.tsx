@@ -89,7 +89,7 @@ export default function MegaMenu({ categories, isOpen, onClose }: MegaMenuProps)
                         <h3 className="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-4">
                             Nổi bật
                         </h3>
-                        <div className="bg-gradient-to-br from-primary-500 to-primary-700 rounded-xl p-6 text-white">
+                        <div className="bg-linear-to-br from-primary-500 to-primary-700 rounded-xl p-6 text-white">
                             <h4 className="text-lg font-bold mb-2">Khuyến mãi mùa hè</h4>
                             <p className="text-sm text-primary-100 mb-4">
                                 Giảm giá đến 50% cho tất cả sản phẩm

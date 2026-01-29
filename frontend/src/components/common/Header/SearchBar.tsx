@@ -77,7 +77,7 @@ export default function SearchBar({
                     'flex items-center bg-gray-100 rounded-full transition-all duration-200',
                     isFocused && 'bg-white ring-2 ring-primary-500 shadow-lg'
                 )}>
-                    <FiSearch className="ml-4 text-gray-400 h-5 w-5 flex-shrink-0" />
+                    <FiSearch className="ml-4 text-gray-400 h-5 w-5 shrink-0" />
                     <input
                         ref={inputRef}
                         type="text"

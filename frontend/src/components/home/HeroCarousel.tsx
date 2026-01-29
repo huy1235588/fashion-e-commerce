@@ -106,7 +106,7 @@ export default function HeroCarousel() {
                         >
                             {/* Background Image */}
                             <div
-                                className="relative min-h-[600px] md:min-h-[700px] lg:min-h-[calc(100vh-80px)] bg-cover bg-center"
+                                className="relative min-h-150 md:min-h-175 lg:min-h-[calc(100vh-80px)] bg-cover bg-center"
                                 style={{ backgroundImage: `url(${slide.image})` }}
                             >
                                 {/* Gradient Overlay */}
@@ -115,14 +115,14 @@ export default function HeroCarousel() {
                                     slide.align === 'center' 
                                         ? 'bg-black/50'
                                         : slide.align === 'right'
-                                        ? 'bg-gradient-to-l from-black/70 via-black/40 to-transparent'
-                                        : 'bg-gradient-to-r from-black/70 via-black/40 to-transparent'
+                                        ? 'bg-linear-to-r from-black/70 via-black/40 to-transparent'
+                                        : 'bg-linear-to-r from-black/70 via-black/40 to-transparent'
                                 )} />
 
                                 {/* Content */}
                                 <div className="relative h-full container mx-auto px-4">
                                     <div className={cn(
-                                        'h-full min-h-[600px] md:min-h-[700px] lg:min-h-[calc(100vh-80px)] flex items-center',
+                                        'h-full min-h-150 md:min-h-175 lg:min-h-[calc(100vh-80px)] flex items-center',
                                         slide.align === 'center' && 'justify-center text-center',
                                         slide.align === 'right' && 'justify-end text-right'
                                     )}>

@@ -68,7 +68,7 @@ export default function CategoriesShowcase({ categories }: CategoriesShowcasePro
                     >
                         <Link
                             href={`/products?category=${featured.id}`}
-                            className="group relative block h-full min-h-[300px] md:min-h-[400px] rounded-2xl overflow-hidden"
+                            className="group relative block h-full min-h-75 md:min-h-100 rounded-2xl overflow-hidden"
                         >
                             {/* Background Image */}
                             <div

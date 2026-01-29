@@ -95,7 +95,7 @@ export default function FlashSale({ products, endTime }: FlashSaleProps) {
     }
 
     return (
-        <section className="py-12 md:py-16 bg-gradient-to-br from-accent-50 via-white to-primary-50">
+        <section className="py-12 md:py-16 bg-linear-to-br from-accent-50 via-white to-primary-50">
             <div className="container mx-auto px-4">
                 {/* Header */}
                 <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6 mb-10">

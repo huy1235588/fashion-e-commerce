@@ -62,11 +62,11 @@ function ToastItem({ toast, onClose }: ToastItemProps) {
         <div
             className={`flex items-start gap-3 min-w-[320px] max-w-md p-4 rounded-lg border-l-4 shadow-lg animate-in slide-in-from-right ${styles[toast.type]}`}
         >
-            <div className="flex-shrink-0 mt-0.5">{icons[toast.type]}</div>
+            <div className="shrink-0 mt-0.5">{icons[toast.type]}</div>
             <p className="flex-1 text-sm font-medium">{toast.message}</p>
             <button
                 onClick={onClose}
-                className="flex-shrink-0 opacity-70 hover:opacity-100 transition-opacity"
+                className="shrink-0 opacity-70 hover:opacity-100 transition-opacity"
                 aria-label="Close"
             >
                 <FiX className="w-4 h-4" />

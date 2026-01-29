@@ -156,7 +156,7 @@ export default function ProductCard({
                 {/* Content */}
                 <div className="p-4">
                     {/* Product name */}
-                    <h3 className="font-medium text-gray-900 line-clamp-2 mb-2 group-hover:text-primary-600 transition-colors min-h-[2.5rem]">
+                    <h3 className="font-medium text-gray-900 line-clamp-2 mb-2 group-hover:text-primary-600 transition-colors min-h-10">
                         {product.name}
                     </h3>
 

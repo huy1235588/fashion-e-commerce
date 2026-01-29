@@ -138,7 +138,7 @@ export default function Testimonials() {
                     initial={{ opacity: 0, y: 30 }}
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true }}
-                    className="mt-16 bg-gradient-to-r from-primary-600 to-primary-700 rounded-3xl p-8 md:p-12"
+                    className="mt-16 bg-linear-to-r from-primary-600 to-primary-700 rounded-3xl p-8 md:p-12"
                 >
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
                         <div className="text-center">

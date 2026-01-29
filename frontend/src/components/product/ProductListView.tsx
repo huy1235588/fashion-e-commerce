@@ -47,7 +47,7 @@ export default function ProductListView({ product }: ProductListViewProps) {
                 {/* Image */}
                 <Link 
                     href={`/products/${product.id}`}
-                    className="relative w-full sm:w-48 md:w-56 aspect-square sm:aspect-auto sm:h-48 overflow-hidden bg-gray-100 flex-shrink-0"
+                    className="relative w-full sm:w-48 md:w-56 aspect-square sm:aspect-auto sm:h-48 overflow-hidden bg-gray-100 shrink-0"
                 >
                     <Image
                         src={imageError ? '/placeholder.png' : getImageUrl(imageUrl)}

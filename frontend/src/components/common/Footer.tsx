@@ -40,7 +40,7 @@ export default function Footer() {
                 <div className="container mx-auto px-4 py-8">
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                         <div className="flex items-center gap-4">
-                            <div className="w-12 h-12 bg-primary-600/20 rounded-xl flex items-center justify-center flex-shrink-0">
+                            <div className="w-12 h-12 bg-primary-600/20 rounded-xl flex items-center justify-center shrink-0">
                                 <FiTruck className="w-6 h-6 text-primary-400" />
                             </div>
                             <div>
@@ -49,7 +49,7 @@ export default function Footer() {
                             </div>
                         </div>
                         <div className="flex items-center gap-4">
-                            <div className="w-12 h-12 bg-success-500/20 rounded-xl flex items-center justify-center flex-shrink-0">
+                            <div className="w-12 h-12 bg-success-500/20 rounded-xl flex items-center justify-center shrink-0">
                                 <FiRefreshCw className="w-6 h-6 text-success-400" />
                             </div>
                             <div>
@@ -58,7 +58,7 @@ export default function Footer() {
                             </div>
                         </div>
                         <div className="flex items-center gap-4">
-                            <div className="w-12 h-12 bg-warning-500/20 rounded-xl flex items-center justify-center flex-shrink-0">
+                            <div className="w-12 h-12 bg-warning-500/20 rounded-xl flex items-center justify-center shrink-0">
                                 <FiShield className="w-6 h-6 text-warning-400" />
                             </div>
                             <div>
@@ -101,7 +101,7 @@ export default function Footer() {
                                 href="https://instagram.com"
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className="w-10 h-10 bg-gray-800 hover:bg-gradient-to-br hover:from-purple-600 hover:to-pink-500 rounded-lg flex items-center justify-center transition-all"
+                                className="w-10 h-10 bg-gray-800 hover:bg-linear-to-br hover:from-purple-600 hover:to-pink-500 rounded-lg flex items-center justify-center transition-all"
                                 aria-label="Instagram"
                             >
                                 <FiInstagram className="w-5 h-5" />

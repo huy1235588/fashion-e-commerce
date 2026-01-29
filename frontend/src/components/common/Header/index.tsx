@@ -57,7 +57,7 @@ export default function Header() {
                 )}
             >
                 <div className="container mx-auto px-4">
-                    <div className="flex items-center justify-between h-16 lg:h-[72px]">
+                    <div className="flex items-center justify-between h-16 lg:h-18">
                         {/* Left section: Logo + Mobile menu */}
                         <div className="flex items-center gap-2">
                             {/* Mobile menu toggle */}

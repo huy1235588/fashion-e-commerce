@@ -171,7 +171,7 @@ export default function ProductsPage() {
             <div className="container mx-auto px-4 py-8">
                 <div className="flex gap-8">
                     {/* Filter Sidebar */}
-                    <div className="w-72 flex-shrink-0 hidden lg:block">
+                    <div className="w-72 shrink-0 hidden lg:block">
                         <FilterSidebar
                             categories={categories}
                             selectedCategory={selectedCategory}
