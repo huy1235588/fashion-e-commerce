@@ -59,3 +59,4 @@ frontend/.env.*.local
 backend/.env
 backend/uploads/*
 !backend/uploads/.gitkeep
+docs/reports/

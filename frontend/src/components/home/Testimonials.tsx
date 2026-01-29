@@ -59,7 +59,7 @@ function StarRating({ rating }: { rating: number }) {
 
 export default function Testimonials() {
     return (
-        <section className="py-12 md:py-16">
+        <section className="py-12 md:py-16 bg-orange-200">
             <div className="container mx-auto px-4">
                 {/* Header */}
                 <div className="text-center mb-12">
@@ -142,25 +142,25 @@ export default function Testimonials() {
                 >
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
                         <div className="text-center">
-                            <div className="text-3xl md:text-4xl font-bold text-white mb-2">
+                            <div className="text-3xl md:text-4xl font-bold mb-2">
                                 10K+
                             </div>
                             <p className="text-primary-100">Khách hàng</p>
                         </div>
                         <div className="text-center">
-                            <div className="text-3xl md:text-4xl font-bold text-white mb-2">
+                            <div className="text-3xl md:text-4xl font-bold mb-2">
                                 50K+
                             </div>
                             <p className="text-primary-100">Đơn hàng</p>
                         </div>
                         <div className="text-center">
-                            <div className="text-3xl md:text-4xl font-bold text-white mb-2">
+                            <div className="text-3xl md:text-4xl font-bold mb-2">
                                 4.9
                             </div>
                             <p className="text-primary-100">Đánh giá trung bình</p>
                         </div>
                         <div className="text-center">
-                            <div className="text-3xl md:text-4xl font-bold text-white mb-2">
+                            <div className="text-3xl md:text-4xl font-bold mb-2">
                                 99%
                             </div>
                             <p className="text-primary-100">Hài lòng</p>

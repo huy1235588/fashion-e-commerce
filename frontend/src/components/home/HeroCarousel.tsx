@@ -29,7 +29,7 @@ interface HeroSlide {
 const slides: HeroSlide[] = [
     {
         id: 1,
-        image: 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=1920&h=1080&fit=crop',
+        image: 'https://images.unsplash.com/photo-1445205170230-053b83016050?w=1920&h=1080&fit=crop',
         title: 'Bộ Sưu Tập Xuân Hè 2025',
         subtitle: 'Mới Ra Mắt',
         description: 'Khám phá xu hướng thời trang mới nhất với phong cách độc đáo và chất lượng cao cấp',
@@ -54,7 +54,7 @@ const slides: HeroSlide[] = [
         description: 'Thanh lịch, chuyên nghiệp với các thiết kế hiện đại cho môi trường làm việc',
         primaryCta: { text: 'Xem ngay', href: '/products?category=office' },
         secondaryCta: { text: 'Tư vấn phối đồ', href: '/products' },
-        align: 'right',
+        align: 'left',
     },
 ];
 
@@ -207,14 +207,14 @@ export default function HeroCarousel() {
             {/* Navigation Arrows */}
             <button
                 onClick={scrollPrev}
-                className="absolute left-4 lg:left-8 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-white/20 backdrop-blur-sm text-white flex items-center justify-center hover:bg-white/30 transition-colors"
+                className="absolute left-4 lg:left-8 bottom-0 -translate-y-1/2 w-12 h-12 rounded-full bg-white/20 backdrop-blur-sm text-white flex items-center justify-center hover:bg-white/30 transition-colors"
                 aria-label="Previous slide"
             >
                 <FiChevronLeft className="w-6 h-6" />
             </button>
             <button
                 onClick={scrollNext}
-                className="absolute right-4 lg:right-8 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-white/20 backdrop-blur-sm text-white flex items-center justify-center hover:bg-white/30 transition-colors"
+                className="absolute right-4 lg:right-8 bottom-0 -translate-y-1/2 w-12 h-12 rounded-full bg-white/20 backdrop-blur-sm text-white flex items-center justify-center hover:bg-white/30 transition-colors"
                 aria-label="Next slide"
             >
                 <FiChevronRight className="w-6 h-6" />

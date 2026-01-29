@@ -2,10 +2,10 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { 
-    FiFacebook, 
-    FiInstagram, 
-    FiYoutube, 
+import {
+    FiFacebook,
+    FiInstagram,
+    FiYoutube,
     FiMail,
     FiPhone,
     FiMapPin,
@@ -35,41 +35,6 @@ export default function Footer() {
 
     return (
         <footer className="bg-gray-900 text-gray-300 mt-auto">
-            {/* Trust badges section */}
-            <div className="border-b border-gray-800">
-                <div className="container mx-auto px-4 py-8">
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                        <div className="flex items-center gap-4">
-                            <div className="w-12 h-12 bg-primary-600/20 rounded-xl flex items-center justify-center shrink-0">
-                                <FiTruck className="w-6 h-6 text-primary-400" />
-                            </div>
-                            <div>
-                                <h4 className="font-semibold text-white">Giao hàng miễn phí</h4>
-                                <p className="text-sm text-gray-400">Đơn hàng từ 500.000₫</p>
-                            </div>
-                        </div>
-                        <div className="flex items-center gap-4">
-                            <div className="w-12 h-12 bg-success-500/20 rounded-xl flex items-center justify-center shrink-0">
-                                <FiRefreshCw className="w-6 h-6 text-success-400" />
-                            </div>
-                            <div>
-                                <h4 className="font-semibold text-white">Đổi trả dễ dàng</h4>
-                                <p className="text-sm text-gray-400">Trong vòng 7 ngày</p>
-                            </div>
-                        </div>
-                        <div className="flex items-center gap-4">
-                            <div className="w-12 h-12 bg-warning-500/20 rounded-xl flex items-center justify-center shrink-0">
-                                <FiShield className="w-6 h-6 text-warning-400" />
-                            </div>
-                            <div>
-                                <h4 className="font-semibold text-white">Thanh toán an toàn</h4>
-                                <p className="text-sm text-gray-400">Bảo mật 100%</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
             {/* Main footer content */}
             <div className="container mx-auto px-4 py-12">
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-12">
@@ -82,10 +47,10 @@ export default function Footer() {
                             Fashion Store
                         </Link>
                         <p className="text-gray-400 text-sm mb-6 leading-relaxed">
-                            Cửa hàng thời trang hàng đầu với các sản phẩm chất lượng cao, 
+                            Cửa hàng thời trang hàng đầu với các sản phẩm chất lượng cao,
                             phong cách hiện đại và giá cả hợp lý.
                         </p>
-                        
+
                         {/* Social links */}
                         <div className="flex items-center gap-3">
                             <a
@@ -251,17 +216,17 @@ export default function Footer() {
                                 {/* Visa */}
                                 <div className="w-10 h-6 bg-white rounded flex items-center justify-center">
                                     <svg viewBox="0 0 48 48" className="h-4">
-                                        <path fill="#1565C0" d="M45,35c0,2.209-1.791,4-4,4H7c-2.209,0-4-1.791-4-4V13c0-2.209,1.791-4,4-4h34c2.209,0,4,1.791,4,4V35z"/>
-                                        <path fill="#FFF" d="M15.186 19l-2.626 7.832c0 0-.667-3.313-.733-3.729-1.495-3.411-3.701-3.221-3.701-3.221L10.726 30v-.002h3.161L18.258 19H15.186zM17.689 30L20.56 30 22.296 19 19.389 19zM38.008 19h-3.021l-4.71 11h2.852l.588-1.571h3.596L37.619 30h2.613L38.008 19zM34.513 26.328l1.563-4.157.818 4.157H34.513zM26.369 22.206c0-.606.498-1.057 1.926-1.057.928 0 1.991.674 1.991.674l.466-2.309c0 0-1.358-.515-2.691-.515-3.019 0-4.576 1.444-4.576 3.272 0 3.306 3.979 2.853 3.979 4.551 0 .291-.231.964-1.888.964-1.662 0-2.759-.609-2.759-.609l-.495 2.216c0 0 1.063.606 3.117.606 2.059 0 4.915-1.54 4.915-3.752C30.354 23.586 26.369 23.394 26.369 22.206z"/>
+                                        <path fill="#1565C0" d="M45,35c0,2.209-1.791,4-4,4H7c-2.209,0-4-1.791-4-4V13c0-2.209,1.791-4,4-4h34c2.209,0,4,1.791,4,4V35z" />
+                                        <path fill="#FFF" d="M15.186 19l-2.626 7.832c0 0-.667-3.313-.733-3.729-1.495-3.411-3.701-3.221-3.701-3.221L10.726 30v-.002h3.161L18.258 19H15.186zM17.689 30L20.56 30 22.296 19 19.389 19zM38.008 19h-3.021l-4.71 11h2.852l.588-1.571h3.596L37.619 30h2.613L38.008 19zM34.513 26.328l1.563-4.157.818 4.157H34.513zM26.369 22.206c0-.606.498-1.057 1.926-1.057.928 0 1.991.674 1.991.674l.466-2.309c0 0-1.358-.515-2.691-.515-3.019 0-4.576 1.444-4.576 3.272 0 3.306 3.979 2.853 3.979 4.551 0 .291-.231.964-1.888.964-1.662 0-2.759-.609-2.759-.609l-.495 2.216c0 0 1.063.606 3.117.606 2.059 0 4.915-1.54 4.915-3.752C30.354 23.586 26.369 23.394 26.369 22.206z" />
                                     </svg>
                                 </div>
                                 {/* Mastercard */}
                                 <div className="w-10 h-6 bg-white rounded flex items-center justify-center">
                                     <svg viewBox="0 0 48 48" className="h-4">
-                                        <path fill="#3F51B5" d="M45,35c0,2.209-1.791,4-4,4H7c-2.209,0-4-1.791-4-4V13c0-2.209,1.791-4,4-4h34c2.209,0,4,1.791,4,4V35z"/>
-                                        <path fill="#FFC107" d="M30 24A6 6 0 1 0 30 36 6 6 0 1 0 30 24z"/>
-                                        <path fill="#FF3D00" d="M18 24A6 6 0 1 0 18 36 6 6 0 1 0 18 24z"/>
-                                        <path fill="#FF9800" d="M24,27.166c-0.963-0.875-1.571-2.134-1.571-3.541c0-1.407,0.608-2.666,1.571-3.541c0.963,0.875,1.571,2.134,1.571,3.541C25.571,25.032,24.963,26.291,24,27.166z"/>
+                                        <path fill="#3F51B5" d="M45,35c0,2.209-1.791,4-4,4H7c-2.209,0-4-1.791-4-4V13c0-2.209,1.791-4,4-4h34c2.209,0,4,1.791,4,4V35z" />
+                                        <path fill="#FFC107" d="M30 24A6 6 0 1 0 30 36 6 6 0 1 0 30 24z" />
+                                        <path fill="#FF3D00" d="M18 24A6 6 0 1 0 18 36 6 6 0 1 0 18 24z" />
+                                        <path fill="#FF9800" d="M24,27.166c-0.963-0.875-1.571-2.134-1.571-3.541c0-1.407,0.608-2.666,1.571-3.541c0.963,0.875,1.571,2.134,1.571,3.541C25.571,25.032,24.963,26.291,24,27.166z" />
                                     </svg>
                                 </div>
                                 {/* VNPay */}

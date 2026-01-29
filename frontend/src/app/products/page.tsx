@@ -170,22 +170,7 @@ export default function ProductsPage() {
             {/* Main Content */}
             <div className="container mx-auto px-4 py-8">
                 <div className="flex gap-8">
-                    {/* Filter Sidebar */}
-                    <div className="w-72 shrink-0 hidden lg:block">
-                        <FilterSidebar
-                            categories={categories}
-                            selectedCategory={selectedCategory}
-                            onCategoryChange={handleCategoryChange}
-                            searchQuery={searchQuery}
-                            onSearchChange={handleSearchChange}
-                            minPrice={minPrice}
-                            maxPrice={maxPrice}
-                            onPriceChange={handlePriceChange}
-                            onClearFilters={handleClearFilters}
-                        />
-                    </div>
-
-                    {/* Mobile Filter Sidebar */}
+                    {/* Filter Sidebar - Responsive for both mobile and desktop */}
                     <FilterSidebar
                         categories={categories}
                         selectedCategory={selectedCategory}
@@ -198,11 +183,10 @@ export default function ProductsPage() {
                         onClearFilters={handleClearFilters}
                         isMobileOpen={mobileFilterOpen}
                         onMobileClose={() => setMobileFilterOpen(false)}
-                        className="lg:hidden"
                     />
 
                     {/* Products */}
-                    <div className="flex-1 min-w-0">
+                    <div className="min-w-0">
                         {isLoading ? (
                             <Loading />
                         ) : products.length === 0 ? (

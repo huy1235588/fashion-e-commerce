@@ -79,7 +79,7 @@ export default function CategoriesShowcase({ categories }: CategoriesShowcasePro
                             />
                             {/* Gradient Overlay */}
                             <div className={cn(
-                                'absolute inset-0 bg-gradient-to-t opacity-80',
+                                'absolute inset-0 bg-linear-to-t opacity-80',
                                 categoryColors[featured.name] || 'from-gray-800 to-gray-900'
                             )} />
                             <div className="absolute inset-0 bg-black/20 group-hover:bg-black/30 transition-colors" />
@@ -125,7 +125,7 @@ export default function CategoriesShowcase({ categories }: CategoriesShowcasePro
                                     }}
                                 />
                                 {/* Gradient Overlay */}
-                                <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent" />
+                                <div className="absolute inset-0 bg-linear-to-t from-black/70 via-black/30 to-transparent" />
 
                                 {/* Icon Circle */}
                                 <div className="absolute top-4 left-4 w-10 h-10 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center">
