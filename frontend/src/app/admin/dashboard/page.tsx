@@ -7,7 +7,8 @@ import { useAuthStore } from '@/store/authStore';
 import { statisticsService, DashboardStats } from '@/services/statistics.service';
 import Loading from '@/components/common/Loading';
 import ErrorMessage from '@/components/common/ErrorMessage';
-import { FiUsers, FiPackage, FiShoppingCart, FiDollarSign, FiTrendingUp, FiAlertTriangle } from 'react-icons/fi';
+import { FiUsers, FiPackage, FiShoppingCart, FiDollarSign, FiAlertTriangle, FiCalendar } from 'react-icons/fi';
+import { StatsCard, RevenueChart, RecentOrdersTable, QuickActions } from '@/components/admin';
 
 export default function AdminDashboardPage() {
     const router = useRouter();
@@ -53,93 +54,181 @@ export default function AdminDashboardPage() {
 
     if (!stats) return null;
 
+    // Mock data for chart (replace with real API data)
+    const revenueChartData = [
+        { date: 'T2', revenue: 1200000, orders: 5 },
+        { date: 'T3', revenue: 2100000, orders: 8 },
+        { date: 'T4', revenue: 1800000, orders: 6 },
+        { date: 'T5', revenue: 2500000, orders: 10 },
+        { date: 'T6', revenue: 3200000, orders: 12 },
+        { date: 'T7', revenue: 4100000, orders: 15 },
+        { date: 'CN', revenue: 2800000, orders: 9 },
+    ];
+
+    // Mock recent orders (replace with real API data)
+    const recentOrders = [
+        {
+            id: 1,
+            order_code: 'DH001234',
+            customer_name: 'Nguyễn Văn A',
+            customer_email: 'nguyenvana@email.com',
+            total: 1250000,
+            status: 'pending',
+            created_at: new Date().toISOString(),
+        },
+        {
+            id: 2,
+            order_code: 'DH001235',
+            customer_name: 'Trần Thị B',
+            customer_email: 'tranthib@email.com',
+            total: 890000,
+            status: 'confirmed',
+            created_at: new Date(Date.now() - 3600000).toISOString(),
+        },
+        {
+            id: 3,
+            order_code: 'DH001236',
+            customer_name: 'Lê Văn C',
+            customer_email: 'levanc@email.com',
+            total: 2150000,
+            status: 'shipping',
+            created_at: new Date(Date.now() - 7200000).toISOString(),
+        },
+    ];
+
     return (
         <PrivateRoute>
             <div className="min-h-screen bg-gray-50">
                 <div className="max-w-7xl mx-auto px-4 py-8">
-                    <h1 className="text-3xl font-bold text-gray-900 mb-8">Dashboard Quản Trị</h1>
+                    {/* Header */}
+                    <div className="mb-8">
+                        <h1 className="text-2xl md:text-3xl font-bold text-gray-900">
+                            Dashboard Quản Trị
+                        </h1>
+                        <p className="text-gray-600 mt-1 flex items-center gap-2">
+                            <FiCalendar className="w-4 h-4" />
+                            {new Date().toLocaleDateString('vi-VN', {
+                                weekday: 'long',
+                                year: 'numeric',
+                                month: 'long',
+                                day: 'numeric',
+                            })}
+                        </p>
+                    </div>
 
-                    {/* Main Stats */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-                        <div className="bg-white rounded-lg shadow p-6">
-                            <div className="flex items-center justify-between mb-2">
-                                <h3 className="text-sm font-medium text-gray-600">Tổng Doanh Thu</h3>
-                                <FiDollarSign className="text-green-600 text-xl" />
-                            </div>
-                            <p className="text-2xl font-bold text-gray-900">{stats.total_revenue.toLocaleString()}₫</p>
-                            <p className="text-sm text-gray-500 mt-1">
-                                Hôm nay: {stats.revenue_today.toLocaleString()}₫
-                            </p>
-                        </div>
+                    {/* Stats Grid */}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 mb-8">
+                        <StatsCard
+                            title="Tổng Doanh Thu"
+                            value={stats.total_revenue}
+                            subtitle={`Hôm nay: ${stats.revenue_today.toLocaleString()}₫`}
+                            icon={FiDollarSign}
+                            iconColor="text-emerald-600"
+                            iconBgColor="bg-emerald-100"
+                            trend={{ value: 12.5, type: 'up' }}
+                            formatAsCurrency
+                            delay={0}
+                        />
+                        <StatsCard
+                            title="Tổng Đơn Hàng"
+                            value={stats.total_orders}
+                            subtitle={`Hôm nay: ${stats.orders_today} đơn`}
+                            icon={FiShoppingCart}
+                            iconColor="text-blue-600"
+                            iconBgColor="bg-blue-100"
+                            trend={{ value: 8.2, type: 'up' }}
+                            delay={0.1}
+                        />
+                        <StatsCard
+                            title="Khách Hàng"
+                            value={stats.total_users}
+                            icon={FiUsers}
+                            iconColor="text-purple-600"
+                            iconBgColor="bg-purple-100"
+                            trend={{ value: 3.1, type: 'up' }}
+                            delay={0.2}
+                        />
+                        <StatsCard
+                            title="Sản Phẩm"
+                            value={stats.total_products}
+                            icon={FiPackage}
+                            iconColor="text-orange-600"
+                            iconBgColor="bg-orange-100"
+                            delay={0.3}
+                        />
+                    </div>
 
-                        <div className="bg-white rounded-lg shadow p-6">
-                            <div className="flex items-center justify-between mb-2">
-                                <h3 className="text-sm font-medium text-gray-600">Tổng Đơn Hàng</h3>
-                                <FiShoppingCart className="text-blue-600 text-xl" />
+                    {/* Pending Orders Alert */}
+                    {stats.pending_orders > 0 && (
+                        <div className="bg-warning-50 border border-warning-200 rounded-2xl p-4 mb-8 flex items-center gap-4">
+                            <div className="w-12 h-12 bg-warning-100 rounded-xl flex items-center justify-center shrink-0">
+                                <FiAlertTriangle className="w-6 h-6 text-warning-600" />
                             </div>
-                            <p className="text-2xl font-bold text-gray-900">{stats.total_orders.toLocaleString()}</p>
-                            <p className="text-sm text-gray-500 mt-1">
-                                Hôm nay: {stats.orders_today}
-                            </p>
+                            <div className="flex-1">
+                                <p className="font-semibold text-warning-800">
+                                    Có {stats.pending_orders} đơn hàng đang chờ xử lý
+                                </p>
+                                <p className="text-sm text-warning-600">
+                                    Vui lòng kiểm tra và xác nhận đơn hàng sớm nhất có thể
+                                </p>
+                            </div>
+                            <button
+                                onClick={() => router.push('/admin/orders?status=pending')}
+                                className="px-4 py-2 bg-warning-600 text-white rounded-xl font-medium hover:bg-warning-700 transition-colors shrink-0"
+                            >
+                                Xem ngay
+                            </button>
                         </div>
+                    )}
 
-                        <div className="bg-white rounded-lg shadow p-6">
-                            <div className="flex items-center justify-between mb-2">
-                                <h3 className="text-sm font-medium text-gray-600">Khách Hàng</h3>
-                                <FiUsers className="text-purple-600 text-xl" />
-                            </div>
-                            <p className="text-2xl font-bold text-gray-900">{stats.total_users.toLocaleString()}</p>
+                    {/* Charts & Table */}
+                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+                        <div className="lg:col-span-2">
+                            <RevenueChart data={revenueChartData} />
                         </div>
+                        <div className="bg-white rounded-2xl border border-gray-100 p-6">
+                            <h3 className="text-lg font-semibold text-gray-900 mb-4">
+                                Tình Trạng Đơn Hàng
+                            </h3>
+                            <div className="space-y-4">
+                                <div className="flex items-center justify-between">
+                                    <span className="text-gray-600">Chờ xử lý</span>
+                                    <span className="font-semibold text-warning-600">
+                                        {stats.pending_orders}
+                                    </span>
+                                </div>
+                                <div className="w-full bg-gray-100 rounded-full h-2">
+                                    <div
+                                        className="bg-warning-500 h-2 rounded-full"
+                                        style={{
+                                            width: `${(stats.pending_orders / stats.total_orders) * 100}%`,
+                                        }}
+                                    />
+                                </div>
+                                <div className="pt-4 border-t">
+                                    <p className="text-sm text-gray-500">
+                                        Tỷ lệ đơn hoàn thành
+                                    </p>
+                                    <p className="text-2xl font-bold text-success-600">
+                                        {(
+                                            ((stats.total_orders - stats.pending_orders) /
+                                                stats.total_orders) *
+                                            100
+                                        ).toFixed(1)}
+                                        %
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
 
-                        <div className="bg-white rounded-lg shadow p-6">
-                            <div className="flex items-center justify-between mb-2">
-                                <h3 className="text-sm font-medium text-gray-600">Sản Phẩm</h3>
-                                <FiPackage className="text-orange-600 text-xl" />
-                            </div>
-                            <p className="text-2xl font-bold text-gray-900">{stats.total_products.toLocaleString()}</p>
-                        </div>
-
-                        <div className="bg-white rounded-lg shadow p-6 md:col-span-2 lg:col-span-1">
-                            <div className="flex items-center justify-between mb-2">
-                                <h3 className="text-sm font-medium text-gray-600">Đơn Chờ Xử Lý</h3>
-                                <FiAlertTriangle className="text-yellow-600 text-xl" />
-                            </div>
-                            <p className="text-2xl font-bold text-gray-900">{stats.pending_orders.toLocaleString()}</p>
-                        </div>
+                    {/* Recent Orders */}
+                    <div className="mb-8">
+                        <RecentOrdersTable orders={recentOrders} />
                     </div>
 
                     {/* Quick Actions */}
-                    <div className="bg-white rounded-lg shadow p-6">
-                        <h2 className="text-lg font-semibold text-gray-900 mb-4">Quản Lý Nhanh</h2>
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                            <button
-                                onClick={() => router.push('/admin/orders')}
-                                className="p-4 border-2 border-gray-200 rounded-lg hover:border-blue-500 hover:bg-blue-50 transition-colors text-left"
-                            >
-                                <FiShoppingCart className="text-2xl text-blue-600 mb-2" />
-                                <h3 className="font-medium text-gray-900">Quản Lý Đơn Hàng</h3>
-                                <p className="text-sm text-gray-500">Xem và cập nhật đơn hàng</p>
-                            </button>
-
-                            <button
-                                onClick={() => router.push('/admin/products')}
-                                className="p-4 border-2 border-gray-200 rounded-lg hover:border-blue-500 hover:bg-blue-50 transition-colors text-left"
-                            >
-                                <FiPackage className="text-2xl text-orange-600 mb-2" />
-                                <h3 className="font-medium text-gray-900">Quản Lý Sản Phẩm</h3>
-                                <p className="text-sm text-gray-500">Thêm và chỉnh sửa sản phẩm</p>
-                            </button>
-
-                            <button
-                                onClick={() => router.push('/admin/users')}
-                                className="p-4 border-2 border-gray-200 rounded-lg hover:border-blue-500 hover:bg-blue-50 transition-colors text-left"
-                            >
-                                <FiUsers className="text-2xl text-purple-600 mb-2" />
-                                <h3 className="font-medium text-gray-900">Quản Lý Người Dùng</h3>
-                                <p className="text-sm text-gray-500">Xem danh sách người dùng</p>
-                            </button>
-                        </div>
-                    </div>
+                    <QuickActions />
                 </div>
             </div>
         </PrivateRoute>
