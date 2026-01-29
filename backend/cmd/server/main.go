@@ -121,7 +121,7 @@ func main() {
 	// Apply middleware in order: Recovery -> Logger -> CORS
 	router.Use(middleware.Recovery())
 	router.Use(middleware.Logger())
-	router.Use(middleware.CORS())
+	router.Use(middleware.CORS(cfg.CORS.AllowOrigins))
 
 	// Register routes
 	api := router.Group("/api/v1")

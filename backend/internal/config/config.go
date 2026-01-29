@@ -16,6 +16,7 @@ type Config struct {
 	Payment  PaymentConfig
 	Email    EmailConfig
 	Upload   UploadConfig
+	CORS     CORSConfig
 }
 
 // ServerConfig holds server-related configuration
@@ -36,8 +37,8 @@ type DatabaseConfig struct {
 
 // AppConfig holds application-level configuration
 type AppConfig struct {
-	Environment    string
-	JWTSecret      string
+	Environment     string
+	JWTSecret       string
 	JWTExpiresHours int
 }
 
@@ -78,6 +79,11 @@ type EmailConfig struct {
 type UploadConfig struct {
 	MaxFileSize int64
 	UploadDir   string
+}
+
+// CORSConfig holds CORS configuration
+type CORSConfig struct {
+	AllowOrigins []string
 }
 
 // Load loads configuration from environment variables
@@ -129,6 +135,9 @@ func Load() (*Config, error) {
 		Upload: UploadConfig{
 			MaxFileSize: getEnvAsInt64("UPLOAD_MAX_FILE_SIZE", 10*1024*1024), // 10MB default
 			UploadDir:   getEnv("UPLOAD_DIR", "./uploads"),
+		},
+		CORS: CORSConfig{
+			AllowOrigins: getEnvAsSlice("CORS_ALLOWED_ORIGINS", []string{"http://localhost:3000", "http://localhost:5173"}),
 		},
 	}
 
@@ -190,4 +199,56 @@ func getEnvAsInt64(key string, defaultValue int64) int64 {
 		return defaultValue
 	}
 	return value
+}
+
+// getEnvAsSlice gets an environment variable as a slice of strings (comma-separated) or returns a default value
+func getEnvAsSlice(key string, defaultValue []string) []string {
+	valueStr := os.Getenv(key)
+	if valueStr == "" {
+		return defaultValue
+	}
+	// Split by comma and trim spaces
+	var result []string
+	for _, v := range splitAndTrim(valueStr, ",") {
+		if v != "" {
+			result = append(result, v)
+		}
+	}
+	if len(result) == 0 {
+		return defaultValue
+	}
+	return result
+}
+
+// splitAndTrim splits a string by delimiter and trims spaces from each element
+func splitAndTrim(s, delimiter string) []string {
+	var result []string
+	for i := 0; i < len(s); {
+		// Find next delimiter
+		idx := i
+		for idx < len(s) && string(s[idx]) != delimiter {
+			idx++
+		}
+		// Trim and add
+		part := trim(s[i:idx])
+		if part != "" {
+			result = append(result, part)
+		}
+		// Move past delimiter
+		i = idx + 1
+	}
+	return result
+}
+
+// trim removes leading and trailing spaces
+func trim(s string) string {
+	start := 0
+	for start < len(s) && s[start] == ' ' {
+		start++
+	}
+	end := len(s)
+	for end > start && s[end-1] == ' ' {
+		end--
+	}
+	return s[start:end]
 }
